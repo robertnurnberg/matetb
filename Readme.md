@@ -5,7 +5,7 @@
     <td width="80%" align="left" valign="top">
         A custom tablebase generator for mate puzzles.
         <br><br>
-        This is the original `matetb.py` script from <a href="https://github.com/robertnurnberg/matetools">matetools</a> ported to C++.
+        This is the original <code>matetb.py</code> script from <a href="https://github.com/robertnurnberg/matetools">matetools</a> ported to C++.
     </td>
     <td width="20%" align="right">
       <img src="https://lichess1.org/export/fen.gif?fen=/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3%20w%20-%20-">
