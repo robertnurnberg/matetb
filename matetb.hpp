@@ -3,6 +3,7 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "external/argparse.hpp"
@@ -16,7 +17,7 @@ using book_t = std::map<std::string, std::string>;
 
 constexpr score_t VALUE_NONE = 30001;
 constexpr score_t VALUE_MATE = 30000;
-constexpr int MAX_DEPTH = std::numeric_limits<int>::max();
+constexpr int MAX_DEPTH = std::numeric_limits<int>::max() - 1;
 
 template <typename T> void split(const std::string &s, char delim, T result) {
   std::istringstream iss(s);
@@ -61,7 +62,7 @@ public:
       excludeAllowingTo, excludeAllowingMoves, excludeAllowingSANs, outFile;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
       excludeAllowingCapture;
-  int depth, verbose;
+  int depth, verbose, concurrency;
   Options()
       : epdStr(""), openingMoves(""), excludeMoves(""), excludeSANs(""),
         excludeFrom(""), excludeTo(""), excludeCapturesOf(""),
@@ -69,14 +70,14 @@ public:
         excludeAllowingMoves(""), excludeAllowingSANs(""), outFile(""),
         excludeCaptures(false), excludeToAttacked(false),
         excludeToCapturable(false), excludeAllowingCapture(false),
-        depth(MAX_DEPTH), verbose(0) {}
-  Options(int argc, char **argv);
+        depth(MAX_DEPTH), verbose(0), concurrency(0) {}
+  Options(int argc, char **argv, bool use_concurrency = false);
   void fill_exclude_options();
   void print(std::ostream &os) const;
 };
 
-Options::Options(int argc, char **argv) : Options() {
-  argparse::ArgumentParser args("matetb");
+Options::Options(int argc, char **argv, bool use_concurrency) : Options() {
+  argparse::ArgumentParser args(use_concurrency ? "matetb_threaded" : "matetb");
   args.add_description(
       "Prove (upper bound) for best mate for a given position by constructing "
       "a custom tablebase for a (reduced) game tree.");
@@ -157,6 +158,11 @@ Options::Options(int argc, char **argv) : Options() {
       .action([](const std::string &value) { return std::stoi(value); })
       .help("Specify the verbosity level. E.g. --verbose 1 shows PVs for all "
             "legal moves, and --verbose 2 also links to chessdb.cn.");
+  if (use_concurrency)
+    args.add_argument("--concurrency")
+        .default_value(int(std::thread::hardware_concurrency()))
+        .action([](const std::string &value) { return std::stoi(value); })
+        .help("Number of concurrent threads to use.");
   try {
     args.parse_args(argc, argv);
   } catch (const std::runtime_error &err) {
@@ -183,6 +189,8 @@ Options::Options(int argc, char **argv) : Options() {
   excludeAllowingSANs = args.get("excludeAllowingSANs");
   outFile = args.get("outFile");
   verbose = args.get<int>("verbose");
+  if (use_concurrency)
+    concurrency = std::max(1, args.get<int>("concurrency"));
   fill_exclude_options();
 }
 
@@ -570,6 +578,8 @@ void Options::print(std::ostream &os) const {
   if (!excludeAllowingSANs.empty())
     os << "--excludeAllowingSANs " << enclosed_string(excludeAllowingSANs)
        << " ";
+  if (concurrency)
+    os << "--concurrency " << concurrency << " ";
   if (!outFile.empty())
     os << "--outFile " << enclosed_string(outFile) << " ";
 }
