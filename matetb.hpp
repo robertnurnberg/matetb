@@ -538,6 +538,23 @@ void Options::fill_exclude_options() {
     excludeAllowingFrom = "a8 b6 c7 h2 f1";
     std::cout << "\n!! WARNING: An engine may be needed (not implemented "
                  "yet).\n\n";
+  } else if (epd == "qbnK1n2/2P2P2/p1k5/P4P2/1Q6/8/8/8 w - -" || // # bm #13
+                                                                 // (not yet)
+             epd == "qbnK1n2/k1P2P2/p7/Pp3P2/8/8/2Q5/8 w - -" || // # bm #16
+                                                                 // (not yet)
+             epd ==
+                 "bn5/k1PK1P1p/p5np/Pp5p/5P1p/2p4p/Q7/8 w - -") { // # bm #103
+                                                                  // (not yet)
+    excludeToCapturable = true;
+    excludeFrom = "a5 c7 d8 f5 f7";
+    excludeTo = "a6 a8 b8 c8 f8";
+    // excludeAllowingFrom = "c7 a8 a6";
+    excludeAllowingFrom = "c7";
+    excludeAllowingTo = "a5 f5 f7";
+    excludeAllowingMoves = "a2a1q b2b1q c2c1q d2d1q e2e1q f2f1q g2g1q h2h1q";
+    excludeCapturesOf = "qrbn";
+    std::cout << "\n!! WARNING: An engine may be needed (not implemented "
+                 "yet).\n\n";
   }
 }
 
