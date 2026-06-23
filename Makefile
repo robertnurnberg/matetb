@@ -1,26 +1,25 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -O3 -g -march=native
 
-SRC_FILES = matetb.hpp matetb.cpp
-EXE_FILE = matetb
+HEADERS = misc.hpp options.hpp matetb.hpp
 EXT_HEADERS = external/chess.hpp external/argparse.hpp
+EXT_HEADERS2 = $(EXT_HEADERS) external/threadpool.hpp external/parallel_hashmap/phmap.h
 
-SRC_FILES2 = matetb.hpp matetb_threaded.cpp
+EXE_FILE = matetb
 EXE_FILE2 = matetb_threaded
-EXT_HEADERS2 = external/chess.hpp external/argparse.hpp external/threadpool.hpp external/parallel_hashmap/phmap.h
 
-.PHONY = all clean format
+.PHONY: all clean format
 
 all: $(EXE_FILE) $(EXE_FILE2)
 
-$(EXE_FILE): $(SRC_FILES) $(EXT_HEADERS)
-	$(CXX) $(CXXFLAGS) -o $(EXE_FILE) $(SRC_FILES)
+$(EXE_FILE): matetb.cpp $(HEADERS) $(EXT_HEADERS)
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
-$(EXE_FILE2): $(SRC_FILES2) $(EXT_HEADERS)
-	$(CXX) $(CXXFLAGS) -std=c++20 -o $(EXE_FILE2) $(SRC_FILES2)
+$(EXE_FILE2): matetb_threaded.cpp $(HEADERS) $(EXT_HEADERS2)
+	$(CXX) $(CXXFLAGS) -std=c++20 -o $@ $<
 
 format:
-	clang-format -i $(SRC_FILES) $(SRC_FILES2)
+	clang-format -i $(HEADERS) matetb.cpp matetb_threaded.cpp
 
 clean:
 	rm -f $(EXE_FILE) $(EXE_FILE2)
