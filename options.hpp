@@ -3,8 +3,8 @@
 #include <thread>
 #include <vector>
 
-#include "misc.hpp"
 #include "external/argparse.hpp"
+#include "misc.hpp"
 
 class Options {
 public:

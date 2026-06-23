@@ -26,8 +26,10 @@ class MateTB : public MateTbBase<index_map_t> {
   void initialize_tb();
   void connect_children();
   void generate_tb();
+
 public:
-  MateTB(const Options &options) : MateTbBase<index_map_t>(options), concurrency(options.concurrency) {}
+  MateTB(const Options &options)
+      : MateTbBase<index_map_t>(options), concurrency(options.concurrency) {}
 };
 
 score_t MateTB::spawn_allowed_children(const PackedBoard &pfen,

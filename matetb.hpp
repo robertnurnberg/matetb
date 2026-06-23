@@ -5,9 +5,9 @@
 #include <thread>
 #include <vector>
 
+#include "external/chess.hpp"
 #include "misc.hpp"
 #include "options.hpp"
-#include "external/chess.hpp"
 
 using namespace chess;
 
@@ -121,8 +121,7 @@ void prepare_opening_book(std::string root_pos, Color mating_side,
   }
 }
 
-template <typename T>
-class MateTbBase {
+template <typename T> class MateTbBase {
 protected:
   T fen2index;
   tb_t tb;
@@ -138,7 +137,7 @@ protected:
   int max_depth, verbose;
 
   bool allowed_move(Board &board, Move move) {
-    // restrict the mating side's candidate moves, to reduce the overall tree size
+    // restrict the mating side's candidate moves, to reduce overall tree size
     if (board.sideToMove() != mating_side)
       return true;
     std::string uci = uci::moveToUci(move);
@@ -156,8 +155,9 @@ protected:
       if (board.isCapture(move))
         return false;
     } else if (!excludeCapturesOf.empty()) {
-      if (board.isCapture(move) && excludeCapturesOf.find(tolower(
-                                       board.at(move.to()))) != std::string::npos)
+      if (board.isCapture(move) &&
+          excludeCapturesOf.find(tolower(board.at(move.to()))) !=
+              std::string::npos)
         return false;
     }
     if (excludeToAttacked && board.isAttacked(move.to(), ~board.sideToMove()))
@@ -172,14 +172,16 @@ protected:
       Movelist legal_moves;
       movegen::legalmoves(legal_moves, board);
       for (const Move &m : legal_moves) {
-        if ((excludeToCapturable && board.isCapture(m) && m.to() == move.to()) ||
+        if ((excludeToCapturable && board.isCapture(m) &&
+             m.to() == move.to()) ||
             (excludeAllowingCapture && board.isCapture(m)) ||
             (BBexcludeAllowingFrom & Bitboard::fromSquare(m.from())) ||
             (BBexcludeAllowingTo & Bitboard::fromSquare(m.to())) ||
             (std::find(excludeAllowingMoves.begin(), excludeAllowingMoves.end(),
                        uci::moveToUci(m)) != excludeAllowingMoves.end()) ||
             (std::find(excludeAllowingSANs.begin(), excludeAllowingSANs.end(),
-                       uci::moveToSan(board, m)) != excludeAllowingSANs.end())) {
+                       uci::moveToSan(board, m)) !=
+             excludeAllowingSANs.end())) {
           board.unmakeMove(move);
           return false;
         }
@@ -242,7 +244,8 @@ public:
   MateTbBase(const Options &options) {
     std::vector<std::string> parts = split(options.epdStr);
     if (parts.size() < 4) {
-      std::cout << "EPD \"" << options.epdStr << "\" is too short." << std::endl;
+      std::cout << "EPD \"" << options.epdStr << "\" is too short."
+                << std::endl;
       std::exit(1);
     }
     root_pos = join(parts.begin(), parts.begin() + 4);
@@ -330,8 +333,8 @@ public:
     std::string pv_str = join(sp[0].second.begin(), sp[0].second.end());
     if (score != VALUE_NONE && score != 0) {
       std::cout << "\nMatetrack:" << std::endl;
-      std::cout << root_pos << " bm #" << score2mate(score) << "; PV: " << pv_str
-                << ";" << std::endl;
+      std::cout << root_pos << " bm #" << score2mate(score)
+                << "; PV: " << pv_str << ";" << std::endl;
     } else
       std::cout << "No mate found." << std::endl;
     if (verbose == 0)
@@ -344,7 +347,8 @@ public:
         continue;
       }
       std::string score_str = "cp " + std::to_string(score);
-      std::string pv_str = join(sp[count].second.begin(), sp[count].second.end());
+      std::string pv_str =
+          join(sp[count].second.begin(), sp[count].second.end());
       if (score != 0)
         score_str += " mate " + std::to_string(score2mate(score));
       if (!pv_str.empty() && pv_str.back() == ';')

@@ -17,6 +17,7 @@ class MateTB : public MateTbBase<index_map_t> {
   void initialize_tb();
   void connect_children();
   void generate_tb();
+
 public:
   MateTB(const Options &options) : MateTbBase<index_map_t>(options) {}
 };
