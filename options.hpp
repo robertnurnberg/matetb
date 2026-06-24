@@ -166,7 +166,8 @@ inline void Options::fill_exclude_options() {
   parts.resize(4);
   std::string epd = join(parts.begin(), parts.end(), " ");
 
-  if (epd == "8/8/7p/5K1k/R7/8/8/8 w - -") { // bm #6
+  if (epd == "8/8/7p/R4K1k/8/8/8/8 b - -" || // bm #-5
+      epd == "8/8/7p/5K1k/R7/8/8/8 w - -") { // bm #6
     excludeAllowingCapture = true;
     excludeAllowingMoves = "h2h1q";
     if (depth == MAX_DEPTH)
@@ -192,7 +193,8 @@ inline void Options::fill_exclude_options() {
     excludeToCapturable = true;
     if (depth == MAX_DEPTH)
       depth = 15;
-  } else if (epd == "k7/2Q5/8/2p5/1pp5/1pp5/prp5/nbK5 w - -") { // bm #11
+  } else if (epd == "k7/3Q4/8/2p5/1pp5/1pp5/prp5/nbK5 b - -" || // bm #-10
+             epd == "k7/2Q5/8/2p5/1pp5/1pp5/prp5/nbK5 w - -") { // bm #11
     excludeFrom = "c1";
     excludeTo = "b2";
     excludeToCapturable = true;
@@ -204,6 +206,7 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "e2";
     excludeToCapturable = true;
   } else if (epd == "8/8/8/6r1/8/6B1/p1p5/k1Kb4 w - -" ||            // bm #7
+             epd == "k7/2Q5/2p5/2p5/2p5/6p1/2p1ppp1/2Kbrqrn b - -" || // bm #-14
              epd == "k7/8/1Qp5/2p5/2p5/6p1/2p1ppp1/2Kbrqrn w - -") { // bm #15
     excludeFrom = "c1";
     excludeToCapturable = true;
@@ -211,7 +214,8 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "e1";
     excludePromotionTo = "qrb";
     excludeToCapturable = true;
-  } else if (epd == "4k3/6Q1/8/8/5p2/1p1p1p2/1ppp1p2/nrqrbK2 w - -") { // bm #15
+  } else if (epd == "4k3/8/5Q2/8/5p2/1p1p1p2/1ppp1p2/nrqrbK2 b - -" || // bm #-14
+             epd == "4k3/6Q1/8/8/5p2/1p1p1p2/1ppp1p2/nrqrbK2 w - -") { // bm #15
     excludeFrom = "f1";
     excludeToCapturable = true;
   } else if (epd == "8/8/8/2p5/1pp5/brpp4/qpprp2P/1nkbnK2 w - -") { // bm #16
@@ -235,27 +239,44 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "c1";
     excludeTo = "a3 c3";
     excludeToCapturable = true;
-  } else if (epd == "4k3/6Q1/8/5p2/5p2/1p3p2/1ppp1p2/nrqrbK2 w - -" || // bm #17
+  } else if (epd == "4k3/2Q5/8/5p2/5p2/1p3p2/1ppp1p2/nrqrbK2 b - -" || // bm #-16
+             epd == "4k3/6Q1/8/5p2/5p2/1p3p2/1ppp1p2/nrqrbK2 w - -" || // bm #17
+             epd == "4k3/8/5Q2/8/8/1p3p2/1ppp1p2/nrqrbK2 b - -" ||     // bm #-17
              epd == "4k3/6Q1/8/8/8/1p3p2/1ppp1p2/nrqrbK2 w - -" ||     // bm #18
              epd == "8/7p/4k3/5p2/3Q1p2/5p2/5p1p/5Kbr w - -") {        // bm #30
     excludeFrom = "f1";
     excludeTo = "h1";
     excludeToCapturable = true;
-  } else if (epd == "8/8/8/8/6k1/8/2Qp1pp1/3Kbrrb w - -" ||        // bm #9
+  } else if (epd == "8/8/6Q1/8/6k1/8/3p1pp1/3Kbrrb b - -" ||       // bm #-8
+             epd == "8/8/8/8/6k1/8/2Qp1pp1/3Kbrrb w - -" ||        // bm #9
+             epd == "8/2Q5/8/2kp4/8/1p1p4/pp1p4/rrbK4 b - -" ||    // bm #-11
              epd == "8/3Q4/8/2kp4/8/1p1p4/pp1p4/rrbK4 w - -" ||    // bm #12
+             epd == "8/8/1Q6/6k1/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-11
              epd == "8/8/8/6k1/3Q4/8/3p1pp1/3Kbrrb w - -" ||       // bm #12
+             epd == "k7/8/8/1Q6/3p4/1p1p4/pp1p4/rrbK4 b - -" ||    // bm #-13
              epd == "k7/8/8/2Q5/3p4/1p1p4/pp1p4/rrbK4 w - -" ||    // bm #14
+             epd == "7k/8/8/8/8/2Q3p1/3p1pp1/3Kbrrn b - -" ||      // bm #-15
              epd == "7k/8/8/8/8/5Qp1/3p1pp1/3Kbrrn w - -" ||       // bm #16
+             epd == "6k1/4Q3/8/8/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-16
              epd == "6k1/8/5Q2/8/8/8/3p1pp1/3Kbrrb w - -" ||       // bm #17
+             epd == "8/4Q1k1/8/8/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-17
              epd == "4Q3/6k1/8/8/8/8/3p1pp1/3Kbrrb w - -" ||       // bm #18
+             epd == "5k2/3Q4/8/8/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-17
              epd == "5k2/8/4Q3/8/8/8/3p1pp1/3Kbrrb w - -" ||       // bm #18
              epd == "6k1/8/8/8/8/3Q4/3p1pp1/3Kbrrb w - -" ||       // bm #18
+             epd == "8/8/8/1p6/1k1Q4/8/pp1p4/rrbK4 b - -" ||       // bm #-17
              epd == "8/8/8/1p6/1k6/3Q4/pp1p4/rrbK4 w - -" ||       // bm #18
+             epd == "4k3/2Q5/8/8/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-18
              epd == "4k3/8/3Q4/8/8/8/3p1pp1/3Kbrrb w - -" ||       // bm #19
+             epd == "4k3/8/3Q4/8/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-19
              epd == "4k3/2Q5/8/8/8/8/3p1pp1/3Kbrrb w - -" ||       // bm #20
+             epd == "8/8/8/2Q5/8/3k4/3p1pp1/3Kbrrb b - -" ||       // bm #-19
              epd == "8/8/8/8/1Q6/3k4/3p1pp1/3Kbrrb w - -" ||       // bm #20
+             epd == "8/8/6k1/1Q6/8/8/3p1pp1/3Kbrrb b - -" ||       // bm #-19
              epd == "8/8/6k1/Q7/8/8/3p1pp1/3Kbrrb w - -" ||        // bm #20
+             epd == "5Q2/8/2k5/8/3p4/1p1p4/pp1p4/rrbK4 b - -" ||   // bm #-19
              epd == "8/8/2k5/8/3p4/Qp1p4/pp1p4/rrbK4 w - -" ||     // bm #20
+             epd == "8/3k1Q2/3p4/8/8/1p1p4/pp1p4/rrbK4 b - -" ||   // bm #-22
              epd == "8/3k4/3p1Q2/8/8/1p1p4/pp1p4/rrbK4 w - -" ||   // bm #23
              epd == "8/1p6/1Q6/8/2kp4/3p4/pp1p4/rrbK4 w - -" ||    // bm #26
              epd == "8/6p1/4Q3/6k1/8/8/3p1pp1/3Kbrrb w - -" ||     // bm #29
@@ -279,7 +300,9 @@ inline void Options::fill_exclude_options() {
     excludeCaptures = true;
     excludeToAttacked = true;
   } else if (epd == "6Q1/8/7k/8/8/6p1/4p1pb/4Kbrr w - -" ||    // bm #12
+             epd == "8/k1Q5/8/8/8/8/1pp1p3/brrbK3 b - -" ||    // bm #-15
              epd == "2Q5/k7/8/8/8/8/1pp1p3/brrbK3 w - -" ||    // bm #16
+             epd == "8/8/3p4/3Q4/8/2k5/ppp1p3/brrbK3 b - -" || // bm #-21
              epd == "8/8/3p4/1Q6/8/2k5/ppp1p3/brrbK3 w - -" || // bm #22
              epd == "8/1p2k3/8/8/5Q2/8/ppp1p3/qrrbK3 w - -" || // bm #50
              epd == "8/1p2k3/8/8/5Q2/8/ppp1p3/bqrbK3 w - -") { // bm #50
