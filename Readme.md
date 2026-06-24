@@ -58,7 +58,7 @@ Optional arguments:
   --excludeAllowingMoves    Space separated UCI moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
   --excludeAllowingSANs     Space separated SAN moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
   --outFile                 Optional output file for the TB. [nargs=0..1] [default: ""]
-  --verbose                 Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn. [nargs=0..1] [default: 0]
+  --verbose                 Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn and bm info. [nargs=0..1] [default: 0]
 ```
 
 ## Threaded version
