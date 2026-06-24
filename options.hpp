@@ -113,8 +113,9 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
   args.add_argument("--verbose")
       .default_value(0)
       .action([](const std::string &value) { return std::stoi(value); })
-      .help("Specify the verbosity level. E.g. --verbose 1 shows PVs for all "
-            "legal moves, and --verbose 2 also links to chessdb.cn.");
+      .help(
+          "Specify the verbosity level. E.g. --verbose 1 shows PVs for all "
+          "legal moves, and --verbose 2 also links to chessdb.cn and bm info.");
   if (use_concurrency)
     args.add_argument("--concurrency")
         .default_value(int(std::thread::hardware_concurrency()))
