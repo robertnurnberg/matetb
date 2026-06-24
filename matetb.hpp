@@ -130,6 +130,7 @@ protected:
   tb_t tb;
   book_t openingBook; // maps FENs to unique moves
   Color mating_side;
+  bool mating_side_to_move;
   std::string root_pos, excludeCapturesOf, excludePromotionTo;
   std::vector<std::string> excludeSANs, excludeMoves, excludeAllowingMoves,
       excludeAllowingSANs;
@@ -254,9 +255,11 @@ public:
     root_pos = join(parts.begin(), parts.begin() + 4);
     max_depth = options.depth;
     mating_side = (parts[1] == "b" ? Color::BLACK : Color::WHITE);
+    mating_side_to_move = true;
     for (size_t i = 4; i < parts.size() - 1; ++i)
       if (parts[i] == "bm" && parts[i + 1].find("#-") != std::string::npos) {
         mating_side = !mating_side;
+        mating_side_to_move = false;
         break;
       }
     std::cout << "Restrict moves for "
@@ -333,7 +336,7 @@ public:
       return a.first > b.first;
     });
     score_t score = sp[0].first;
-    std::string pv_str = join(sp[0].second.begin(), sp[0].second.end());
+    auto pv_str = join(sp[0].second.begin(), sp[0].second.end());
     if (score != VALUE_NONE && score != 0) {
       std::cout << "\nMatetrack:" << std::endl;
       std::cout << root_pos << " bm #" << score2mate(score)
@@ -345,21 +348,31 @@ public:
     std::cout << "\nMultiPV:" << std::endl;
     for (size_t count = 0; count < sp.size(); ++count) {
       score_t score = sp[count].first;
-      if (score == VALUE_NONE) {
+      if (score == VALUE_NONE || (score < 0 && mating_side_to_move)) {
         std::cout << "multipv " << count + 1 << " score None" << std::endl;
         continue;
       }
       std::string score_str = "cp " + std::to_string(score);
-      std::string pv_str =
-          join(sp[count].second.begin(), sp[count].second.end());
+      pv_str = join(sp[count].second.begin(), sp[count].second.end());
       if (score != 0)
         score_str += " mate " + std::to_string(score2mate(score));
-      if (!pv_str.empty() && pv_str.back() == ';')
-        pv_str.pop_back();
       std::cout << "multipv " << count + 1 << " score " << score_str << " pv "
                 << pv_str << std::endl;
-      if (verbose >= 2)
-        std::cout << cdb_link(root_pos, pv_str) << "\n\n";
+      if (verbose >= 2) {
+        std::cout << cdb_link(root_pos, pv_str) << "\n";
+        if (score != 0) {
+          auto child_pv_str =
+              join(sp[count].second.begin() + 1, sp[count].second.end());
+          std::cout << "Child FEN: ";
+          auto move = uci::uciToMove(board, sp[count].second[0]);
+          board.makeMove<true>(move);
+          std::cout << board.getFen(false) << " bm #"
+                    << score2mate(-score + (score < 0 ? 1 : -1))
+                    << "; PV: " << child_pv_str << ";\n";
+          board.unmakeMove(move);
+        }
+        std::cout << "\n";
+      }
     }
   }
 
