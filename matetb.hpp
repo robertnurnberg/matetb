@@ -336,7 +336,7 @@ public:
       return a.first > b.first;
     });
     score_t score = sp[0].first;
-    std::string pv_str = join(sp[0].second.begin(), sp[0].second.end());
+    auto pv_str = join(sp[0].second.begin(), sp[0].second.end());
     if (score != VALUE_NONE && score != 0) {
       std::cout << "\nMatetrack:" << std::endl;
       std::cout << root_pos << " bm #" << score2mate(score)
@@ -353,8 +353,7 @@ public:
         continue;
       }
       std::string score_str = "cp " + std::to_string(score);
-      std::string pv_str =
-          join(sp[count].second.begin(), sp[count].second.end());
+      pv_str = join(sp[count].second.begin(), sp[count].second.end());
       if (score != 0)
         score_str += " mate " + std::to_string(score2mate(score));
       std::cout << "multipv " << count + 1 << " score " << score_str << " pv "
@@ -362,14 +361,14 @@ public:
       if (verbose >= 2) {
         std::cout << cdb_link(root_pos, pv_str) << "\n";
         if (score != 0) {
-          std::string pv_str =
+          auto child_pv_str =
               join(sp[count].second.begin() + 1, sp[count].second.end());
           std::cout << "Child FEN: ";
           auto move = uci::uciToMove(board, sp[count].second[0]);
           board.makeMove<true>(move);
           std::cout << board.getFen(false) << " bm #"
                     << score2mate(-score + (score < 0 ? 1 : -1))
-                    << "; PV: " << pv_str << ";\n";
+                    << "; PV: " << child_pv_str << ";\n";
           board.unmakeMove(move);
         }
         std::cout << "\n";
