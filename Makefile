@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O3 -g -march=native
+CXXFLAGS = -std=c++20 -Wall -Wextra -O3 -g -march=native
 
 HEADERS = misc.hpp options.hpp matetb.hpp
 EXT_HEADERS = external/chess.hpp external/argparse.hpp
@@ -16,7 +16,7 @@ $(EXE_FILE): matetb.cpp $(HEADERS) $(EXT_HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(EXE_FILE2): matetb_threaded.cpp $(HEADERS) $(EXT_HEADERS2)
-	$(CXX) $(CXXFLAGS) -std=c++20 -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 format:
 	clang-format -i $(HEADERS) matetb.cpp matetb_threaded.cpp

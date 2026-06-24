@@ -1,9 +1,12 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -16,7 +19,7 @@ using namespace chess;
 using PackedBoard = std::array<std::uint8_t, 24>;
 
 struct PackedBoardHash {
-  size_t operator()(const PackedBoard pbfen) const {
+  size_t operator()(const PackedBoard &pbfen) const {
     std::string_view sv(reinterpret_cast<const char *>(pbfen.data()),
                         pbfen.size());
     return std::hash<std::string_view>{}(sv);

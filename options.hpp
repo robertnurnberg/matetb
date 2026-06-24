@@ -32,7 +32,8 @@ public:
   void print(std::ostream &os) const;
 };
 
-Options::Options(int argc, char **argv, bool use_concurrency) : Options() {
+inline Options::Options(int argc, char **argv, bool use_concurrency)
+    : Options() {
   argparse::ArgumentParser args(use_concurrency ? "matetb_threaded" : "matetb");
   args.add_description(
       "Prove (upper bound) for best mate for a given position by constructing "
@@ -150,7 +151,7 @@ Options::Options(int argc, char **argv, bool use_concurrency) : Options() {
   fill_exclude_options();
 }
 
-void Options::fill_exclude_options() {
+inline void Options::fill_exclude_options() {
   // For some known EPDs, this defines the right exclude commands.
   if (!openingMoves.empty() || !excludeMoves.empty() || !excludeSANs.empty() ||
       !excludeFrom.empty() || !excludeTo.empty() || excludeCaptures ||
@@ -497,7 +498,7 @@ void Options::fill_exclude_options() {
   }
 }
 
-void Options::print(std::ostream &os) const {
+inline void Options::print(std::ostream &os) const {
   os << "--epd \"" << epdStr << "\" ";
   if (depth < MAX_DEPTH)
     os << "--depth " << depth << " ";
@@ -540,7 +541,7 @@ void Options::print(std::ostream &os) const {
     os << "--outFile " << enclosed_string(outFile) << " ";
 }
 
-std::ostream &operator<<(std::ostream &os, const Options &opt) {
+inline std::ostream &operator<<(std::ostream &os, const Options &opt) {
   opt.print(os);
   return os;
 }
