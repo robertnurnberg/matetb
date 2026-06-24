@@ -26,7 +26,7 @@ template <typename T> void split(const std::string &s, char delim, T result) {
   }
 }
 
-std::vector<std::string> split(const std::string &s, char delim = ' ') {
+inline std::vector<std::string> split(const std::string &s, char delim = ' ') {
   std::vector<std::string> elems;
   split(s, delim, std::back_inserter(elems));
   return elems;
@@ -42,13 +42,14 @@ std::string join(T begin, T end, std::string const &separator = " ") {
   return result.str();
 }
 
-std::string enclosed_string(const std::string &s) {
+inline std::string enclosed_string(const std::string &s) {
   if (s.find(" ") != std::string::npos)
     return "\"" + s + "\"";
   return s;
 }
 
-std::string cdb_link(const std::string &root_pos, const std::string &pv_str) {
+inline std::string cdb_link(const std::string &root_pos,
+                            const std::string &pv_str) {
   auto s = "https://chessdb.cn/queryc_en/?" + root_pos + " moves " + pv_str;
   return std::regex_replace(s, std::regex(" "), "_");
 }

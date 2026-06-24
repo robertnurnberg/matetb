@@ -34,9 +34,9 @@ inline score_t score2mate(score_t score) {
   return VALUE_NONE;
 }
 
-void prepare_opening_book(std::string root_pos, Color mating_side,
-                          const std::string &openingMoves, int verbose,
-                          book_t &openingBook) {
+inline void prepare_opening_book(std::string root_pos, Color mating_side,
+                                 const std::string &openingMoves, int verbose,
+                                 book_t &openingBook) {
   std::vector<std::vector<std::string>> lines;
   std::string line;
   std::istringstream iss(openingMoves);
