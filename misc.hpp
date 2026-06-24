@@ -1,7 +1,9 @@
-#ifndef MISC_H_INCLUDED
-#define MISC_H_INCLUDED
+#pragma once
 
+#include <cstdint>
+#include <iterator>
 #include <limits>
+#include <map>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -50,5 +52,3 @@ std::string cdb_link(const std::string &root_pos, const std::string &pv_str) {
   auto s = "https://chessdb.cn/queryc_en/?" + root_pos + " moves " + pv_str;
   return std::regex_replace(s, std::regex(" "), "_");
 }
-
-#endif

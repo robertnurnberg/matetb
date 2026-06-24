@@ -11,7 +11,7 @@
 using namespace chess;
 
 // unordered map to map FENs from game tree to their index idx
-using index_map_t = std::unordered_map<PackedBoard, index_t>;
+using index_map_t = std::unordered_map<PackedBoard, index_t, PackedBoardHash>;
 
 class MateTB : public MateTbBase<index_map_t> {
   void initialize_tb();

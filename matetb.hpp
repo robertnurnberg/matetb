@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -13,20 +15,18 @@ using namespace chess;
 
 using PackedBoard = std::array<std::uint8_t, 24>;
 
-namespace std {
-template <> struct hash<PackedBoard> {
+struct PackedBoardHash {
   size_t operator()(const PackedBoard pbfen) const {
     std::string_view sv(reinterpret_cast<const char *>(pbfen.data()),
                         pbfen.size());
     return std::hash<std::string_view>{}(sv);
   }
 };
-} // namespace std
 
 // a vector with idx -> {score, children}, children being a vector of indices
 using tb_t = std::vector<std::pair<score_t, std::vector<index_t>>>;
 
-score_t score2mate(score_t score) {
+inline score_t score2mate(score_t score) {
   if (score > 0)
     return (VALUE_MATE - score + 1) / 2;
   if (score < 0)
@@ -251,7 +251,7 @@ public:
     root_pos = join(parts.begin(), parts.begin() + 4);
     max_depth = options.depth;
     mating_side = (parts[1] == "b" ? Color::BLACK : Color::WHITE);
-    for (size_t i = 4; i < parts.size(); ++i)
+    for (size_t i = 4; i < parts.size() - 1; ++i)
       if (parts[i] == "bm" && parts[i + 1].find("#-") != std::string::npos) {
         mating_side = !mating_side;
         break;

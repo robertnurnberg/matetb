@@ -16,7 +16,7 @@ using namespace chess;
 
 // unordered map to map FENs from game tree to their index idx
 using index_map_t = phmap::parallel_flat_hash_map<
-    PackedBoard, index_t, std::hash<PackedBoard>, std::equal_to<PackedBoard>,
+    PackedBoard, index_t, PackedBoardHash, std::equal_to<PackedBoard>,
     std::allocator<std::pair<PackedBoard, index_t>>, 8, std::mutex>;
 
 class MateTB : public MateTbBase<index_map_t> {
