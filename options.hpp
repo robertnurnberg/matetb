@@ -470,9 +470,10 @@ inline void Options::fill_exclude_options() {
     excludeAllowingCapture = true;
     excludeAllowingFrom = "b2 c2 d2 e2";
     excludeAllowingSANs = "Ke3 Kf3 Kh1 Kg2 Kh2";
-  } else if (epd == "7K/8/8/8/4n3/pp1N3p/rp2N1br/bR3n1k w - -" ||         // bm #3
-             epd == "7K/8/8/7p/p3n3/1p1N3p/rp2N1br/bR3n1k w - -" ||       // bm #31
-             epd == "7K/3p4/4p3/1p5p/p3n3/1p1N3p/rp2N1br/bR3n1k w - -") { // bm #96
+  } else if (epd == "7K/8/8/8/4n3/pp1N3p/rp2N1br/bR3n1k w - -" ||          // bm #3
+             epd == "7K/8/8/7p/p3n3/1p1N3p/rp2N1br/bR3n1k w - -" ||        // bm #31
+             epd == "8/3p2K1/4p3/1p5p/p3n3/1p1N3p/rp2N1br/bR3n1k b - -" || // bm #-95
+             epd == "7K/3p4/4p3/1p5p/p3n3/1p1N3p/rp2N1br/bR3n1k w - -") {  // bm #96
     excludeFrom = "d3 e2";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "b2 h2 h1";
@@ -488,6 +489,7 @@ inline void Options::fill_exclude_options() {
   } else if (epd == "n1K5/bNp5/1pP5/1k4p1/1N2pnp1/PP2p1p1/4rpP1/5B2 w - -" ||   // bm #16
              epd == "n1K5/bNp1p3/1pP5/1k4p1/1N3np1/PP2p1p1/4rpP1/5B2 w - -" ||  // bm #35
              epd == "n1K5/bNp1p1p1/1pP5/1k6/1N3np1/PP2p1p1/4rpP1/5B2 w - -" ||  // bm #57
+             epd == "n7/bNpKp1p1/1pP3p1/1k2p3/1N3n2/PP4p1/4rpP1/5B2 b - -" ||   // bm #-100
              epd == "n1K5/bNp1p1p1/1pP3p1/1k2p3/1N3n2/PP4p1/4rpP1/5B2 w - -") { // bm #101
     excludeFrom = "a3 b3 b4 b7 c6 g2";
     excludeAllowingCapture = true;
@@ -499,6 +501,7 @@ inline void Options::fill_exclude_options() {
     std::cout << "\n!! WARNING: An engine may be needed (not implemented yet).\n\n";
   } else if (epd == "8/8/8/3p2p1/p2np1K1/p3N1pp/rb1N2pr/k1n3Rb w - -" ||  // bm #4
              epd == "8/8/8/3p2p1/p2np1Kp/p3N1p1/rb1N2pr/k1n3Rb w - -" ||  // bm #35
+             epd == "8/4p3/3p4/p5pK/3n3p/p3N1p1/rb1N2pr/k1n3Rb b - -" ||  // bm #-101
              epd == "8/4p3/3p4/p5p1/3n2Kp/p3N1p1/rb1N2pr/k1n3Rb w - -") { // bm #102
     excludeFrom = "d2 e3 g1";
     excludeTo = "g3";
@@ -508,9 +511,12 @@ inline void Options::fill_exclude_options() {
   } else if (epd == "2RN1qN1/5P2/3p1P2/3P4/1K6/1p1p1pp1/1p1p1np1/bk1b2Q1 w - -" ||  // bm #5
              epd == "2RN1qN1/5P2/3p1P2/3P4/8/Kp1p1pp1/1p1p1np1/bk1b2Q1 w - -" ||    // bm #21
              epd == "3N1qN1/1Kn2P2/3p1Pp1/3P1pp1/R7/1p1p4/1p1p1n2/bk1b2Q1 w - -" || // bm #107
+             epd == "3N1qN1/1Kn2P2/1Q1p1Pp1/3P1pp1/R7/1p1p4/kp1p4/b2b3n b - -" ||   // bm #-108
              epd == "3N1qN1/1Kn2P2/1Q1p1Pp1/3P1pp1/1R6/1p1p4/kp1p4/b2b3n w - -") {  // bm #109 (not yet)
     if (epd == "3N1qN1/1Kn2P2/1Q1p1Pp1/3P1pp1/1R6/1p1p4/kp1p4/b2b3n w - -")
       openingMoves = "b4a4 * b6g1";
+    else if (epd == "3N1qN1/1Kn2P2/1Q1p1Pp1/3P1pp1/R7/1p1p4/kp1p4/b2b3n b - -")
+      openingMoves = "* b6g1";
     excludeFrom = "d5 e7 g7 e8";
     excludeTo = "d6 a1 b2 b3 d1 d2 d3";
     excludeSANs = "Qxf2 Qxf3 Qxf4 Qxf5 Qxf6 Qxf7 Qxg8 Qxg2 Qxg3 Qxg4 Qxg5 "
@@ -537,22 +543,26 @@ inline void Options::fill_exclude_options() {
     excludeAllowingCapture = true;
     excludeAllowingFrom = "a1 h1";
     excludeAllowingSANs = "Kb1 Kc2 Kd1 Kd2";
-  } else if (epd == "r1b5/1pKp4/pP1P4/P6B/3pn3/1P1k4/1P6/5N1N w - -" ||       // bm #4
-             epd == "r1b5/1pKp4/pP1P4/P6B/3pn2p/1P1k4/1P6/5N1N w - -" ||      // bm #26
-             epd == "r1b5/1pKp4/pP1P1p1p/P4p1B/3pn2p/1P1k4/1P6/5N1N w - -") { // bm #121
-    openingMoves = "h5d1";
+  } else if (epd == "r1b5/1pKp4/pP1P4/P6B/3pn3/1P1k4/1P6/5N1N w - -" ||        // bm #4
+             epd == "r1b5/1pKp4/pP1P4/P6B/3pn2p/1P1k4/1P6/5N1N w - -" ||       // bm #26
+             epd == "r1b5/1pKp4/pP1P1p1p/P4p2/3pn2p/1P1k4/1P6/3B1N1N b - -" || // bm #-120
+             epd == "r1b5/1pKp4/pP1P1p1p/P4p1B/3pn2p/1P1k4/1P6/5N1N w - -") {  // bm #121
+    if (epd.find(" w ") != std::string::npos)
+      openingMoves = "h5d1";
     excludeFrom = "d1 f1 h1 b2 b3 a5 b6 d6";
     excludeTo = "c8";
     excludeAllowingFrom = "d3 d4 a6 b7 c8 d7";
     excludeAllowingTo = "d1 f1 h1";
     std::cout << "\n!! WARNING: An engine may be needed (not implemented yet).\n\n";
-  } else if (epd == "8/1p1p4/3p2p1/5pP1/1p3P1k/1P1p1P1p/1P1P1P1K/7B w - -") { // bm #121
+  } else if (epd == "8/1p1p4/3p2p1/5pP1/1p3P1k/1P1p1P1p/1P1P1P2/6KB b - -" || // bm #-120
+             epd == "8/1p1p4/3p2p1/5pP1/1p3P1k/1P1p1P1p/1P1P1P1K/7B w - -") { // bm #121
     excludeCaptures = true;
     excludeFrom = "h1";
     std::cout << "\n!! WARNING: An engine may be needed (not implemented yet).\n\n";
   } else if (epd == "n7/b1p1K3/1pP5/1P6/7p/1p4Pn/1P2N1br/3NRn1k w - -" ||     // bm #6
              epd == "n7/b1p1K3/1pP5/1P6/6pp/1p4Pn/1P2N1br/3NRn1k w - -" ||    // bm #9
              epd == "n7/b1p1K3/1pP5/1P4p1/6pp/1p4Pn/1P2N1br/3NRn1k w - -" ||  // bm #92
+             epd == "n7/b1p5/1pP2K1p/1P4p1/6p1/1p4Pn/1P2N1br/3NRn1k b - -" || // bm #-125
              epd == "n7/b1p1K3/1pP4p/1P4p1/6p1/1p4Pn/1P2N1br/3NRn1k w - -") { // bm #126
     excludeFrom = "b2 d1 e1 b5 c6";
     excludeTo = "a8 b6 c7 b3";
