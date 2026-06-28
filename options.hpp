@@ -169,7 +169,7 @@ inline void Options::fill_exclude_options() {
   // clang-format off
   if (epd == "8/2Nb4/pp6/4rp1p/1Pp1pPkP/PpPpR3/1B1P2N1/2K5 b - -" || // bm #-4
       epd == "8/2Nb4/pp6/4rp1p/1Pp1pPkP/PpPpR3/1B1P2N1/1K6 w - -") { // bm #5
-    excludeFrom = "f4 h4 d2 c3 a8 e6 b5 a6 g7 e6 d6";
+    excludeFrom = "f4 h4 d2 c3 a8 e6 b5 a6 g7 d6";
     excludeTo = "f5 h5 b3 c4 d3 e4";
     excludeMoves = "a3a4";
     excludeAllowingFrom = "g4 f5 h5 e4 d3 c4 a1 b1 c1 d1 e1 f1 g1 h1";
