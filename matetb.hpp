@@ -148,7 +148,8 @@ protected:
     if (std::find(excludeMoves.begin(), excludeMoves.end(), uci) !=
         excludeMoves.end())
       return false;
-    if (std::find(excludeSANs.begin(), excludeSANs.end(),
+    if (!excludeSANs.empty() &&
+        std::find(excludeSANs.begin(), excludeSANs.end(),
                   uci::moveToSan(board, move)) != excludeSANs.end())
       return false;
     if (!BBrestrictTo.empty() &&
