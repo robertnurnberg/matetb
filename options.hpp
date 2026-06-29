@@ -13,7 +13,8 @@
 
 class Options {
 public:
-  std::string epdStr, openingMoves, excludeMoves, excludeSANs, excludeFrom,
+  std::string epdStr, openingMoves, excludeMoves, excludeSANs, restrictTo,
+    excludeFrom,
       excludeTo, excludeCapturesOf, excludePromotionTo, excludeAllowingFrom,
       excludeAllowingTo, excludeAllowingMoves, excludeAllowingSANs, outFile;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
@@ -21,7 +22,7 @@ public:
   int depth, verbose, concurrency;
   Options()
       : epdStr(""), openingMoves(""), excludeMoves(""), excludeSANs(""),
-        excludeFrom(""), excludeTo(""), excludeCapturesOf(""),
+        restrictTo(""), excludeFrom(""), excludeTo(""), excludeCapturesOf(""),
         excludePromotionTo(""), excludeAllowingFrom(""), excludeAllowingTo(""),
         excludeAllowingMoves(""), excludeAllowingSANs(""), outFile(""),
         excludeCaptures(false), excludeToAttacked(false),
@@ -58,6 +59,9 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
   args.add_argument("--excludeSANs")
       .default_value("")
       .help("Space separated SAN moves that are not allowed.");
+  args.add_argument("--restrictTo")
+      .default_value("")
+      .help("Space separated square names that pieces can move to.");
   args.add_argument("--excludeFrom")
       .default_value("")
       .help("Space separated square names that pieces should never move from.");
@@ -133,6 +137,7 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
   openingMoves = args.get("openingMoves");
   excludeMoves = args.get("excludeMoves");
   excludeSANs = args.get("excludeSANs");
+  restrictTo = args.get("restrictTo");
   excludeFrom = args.get("excludeFrom");
   excludeTo = args.get("excludeTo");
   excludeCaptures = args.get<bool>("excludeCaptures");
@@ -155,7 +160,7 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
 inline void Options::fill_exclude_options() {
   // For some known EPDs, this defines the right exclude commands.
   if (!openingMoves.empty() || !excludeMoves.empty() || !excludeSANs.empty() ||
-      !excludeFrom.empty() || !excludeTo.empty() || excludeCaptures ||
+      !restrictTo.empty() || !excludeFrom.empty() || !excludeTo.empty() || excludeCaptures ||
       !excludeCapturesOf.empty() || excludeToAttacked || excludeToCapturable ||
       !excludePromotionTo.empty() || excludeAllowingCapture ||
       !excludeAllowingFrom.empty() || !excludeAllowingTo.empty() ||
@@ -200,6 +205,12 @@ inline void Options::fill_exclude_options() {
     excludeToCapturable = true;
     if (depth == MAX_DEPTH)
       depth = 13;
+  } else if (epd == "5brk/4p1p1/4P1Kp/4P1p1/p1p3P1/2P3p1/p5P1/7R b - -" || // bm #-6
+             epd == "5brk/4p1p1/4P1Kp/4P1p1/p1p3P1/2P3p1/p5P1/R7 w - -") { // bm #7
+    excludeFrom = "g6 g4 g2";
+    excludeAllowingTo = "g1 b1";
+    excludeAllowingFrom = "a1 h1";
+    excludeToCapturable = true;
   } else if (epd == "8/Q7/8/1r6/kp6/bp6/1p6/1K6 b - -" ||  // bm #-7
              epd == "8/3Q4/8/1r6/kp6/bp6/1p6/1K6 w - -") { // bm #8
     excludeFrom = "b1";
@@ -598,6 +609,8 @@ inline void Options::print(std::ostream &os) const {
     os << "--excludeMoves " << enclosed_string(excludeMoves) << " ";
   if (!excludeSANs.empty())
     os << "--excludeSANs " << enclosed_string(excludeSANs) << " ";
+  if (!restrictTo.empty())
+    os << "--restrictTo " << enclosed_string(restrictTo) << " ";
   if (!excludeFrom.empty())
     os << "--excludeFrom " << enclosed_string(excludeFrom) << " ";
   if (!excludeTo.empty())

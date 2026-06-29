@@ -45,6 +45,7 @@ Optional arguments:
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
   --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
   --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
   --excludeCaptures         Never capture.
@@ -107,6 +108,7 @@ Optional arguments:
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
   --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
   --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
   --excludeCaptures         Never capture.
