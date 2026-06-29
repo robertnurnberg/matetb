@@ -33,7 +33,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
+Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
@@ -96,7 +96,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
+Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
