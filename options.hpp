@@ -14,9 +14,9 @@
 class Options {
 public:
   std::string epdStr, openingMoves, excludeMoves, excludeSANs, restrictTo,
-    excludeFrom,
-      excludeTo, excludeCapturesOf, excludePromotionTo, excludeAllowingFrom,
-      excludeAllowingTo, excludeAllowingMoves, excludeAllowingSANs, outFile;
+      excludeFrom, excludeTo, excludeCapturesOf, excludePromotionTo,
+      excludeAllowingFrom, excludeAllowingTo, excludeAllowingMoves,
+      excludeAllowingSANs, outFile;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
       excludeAllowingCapture;
   int depth, verbose, concurrency;
@@ -160,11 +160,12 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
 inline void Options::fill_exclude_options() {
   // For some known EPDs, this defines the right exclude commands.
   if (!openingMoves.empty() || !excludeMoves.empty() || !excludeSANs.empty() ||
-      !restrictTo.empty() || !excludeFrom.empty() || !excludeTo.empty() || excludeCaptures ||
-      !excludeCapturesOf.empty() || excludeToAttacked || excludeToCapturable ||
-      !excludePromotionTo.empty() || excludeAllowingCapture ||
-      !excludeAllowingFrom.empty() || !excludeAllowingTo.empty() ||
-      !excludeAllowingMoves.empty() || !excludeAllowingSANs.empty())
+      !restrictTo.empty() || !excludeFrom.empty() || !excludeTo.empty() ||
+      excludeCaptures || !excludeCapturesOf.empty() || excludeToAttacked ||
+      excludeToCapturable || !excludePromotionTo.empty() ||
+      excludeAllowingCapture || !excludeAllowingFrom.empty() ||
+      !excludeAllowingTo.empty() || !excludeAllowingMoves.empty() ||
+      !excludeAllowingSANs.empty())
     return;
 
   auto parts = split(epdStr);
