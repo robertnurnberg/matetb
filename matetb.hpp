@@ -134,7 +134,7 @@ protected:
   std::string root_pos, excludeCapturesOf, excludePromotionTo;
   std::vector<std::string> excludeSANs, excludeMoves, excludeAllowingMoves,
       excludeAllowingSANs;
-  Bitboard BBexcludeFrom, BBexcludeTo, BBexcludeAllowingFrom,
+  Bitboard BBrestrictTo, BBexcludeFrom, BBexcludeTo, BBexcludeAllowingFrom,
       BBexcludeAllowingTo;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
       excludeAllowingCapture, needToGenerateResponses;
@@ -148,8 +148,12 @@ protected:
     if (std::find(excludeMoves.begin(), excludeMoves.end(), uci) !=
         excludeMoves.end())
       return false;
-    if (std::find(excludeSANs.begin(), excludeSANs.end(),
+    if (!excludeSANs.empty() &&
+        std::find(excludeSANs.begin(), excludeSANs.end(),
                   uci::moveToSan(board, move)) != excludeSANs.end())
+      return false;
+    if (!BBrestrictTo.empty() &&
+        !(BBrestrictTo & Bitboard::fromSquare(move.to())))
       return false;
     if (BBexcludeFrom & Bitboard::fromSquare(move.from()))
       return false;
@@ -267,6 +271,8 @@ public:
               << std::endl;
     excludeSANs = split(options.excludeSANs);
     excludeMoves = split(options.excludeMoves);
+    for (const std::string &sq : split(options.restrictTo))
+      BBrestrictTo |= Bitboard::fromSquare(Square(sq));
     for (const std::string &sq : split(options.excludeFrom))
       BBexcludeFrom |= Bitboard::fromSquare(Square(sq));
     for (const std::string &sq : split(options.excludeTo))

@@ -33,7 +33,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
+Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
@@ -45,6 +45,7 @@ Optional arguments:
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
   --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
   --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
   --excludeCaptures         Never capture.
@@ -95,7 +96,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
+Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
@@ -107,6 +108,7 @@ Optional arguments:
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
   --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
   --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
   --excludeCaptures         Never capture.
