@@ -151,7 +151,8 @@ protected:
     if (std::find(excludeSANs.begin(), excludeSANs.end(),
                   uci::moveToSan(board, move)) != excludeSANs.end())
       return false;
-    if (!BBrestrictTo.empty() && !(BBrestrictTo & Bitboard::fromSquare(move.to())))
+    if (!BBrestrictTo.empty() &&
+        !(BBrestrictTo & Bitboard::fromSquare(move.to())))
       return false;
     if (BBexcludeFrom & Bitboard::fromSquare(move.from()))
       return false;
