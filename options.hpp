@@ -584,6 +584,12 @@ inline void Options::fill_exclude_options() {
     excludePromotionTo = "qrbn";
     excludeAllowingFrom = "a8 b6 c7 h2 f1";
     std::cout << "\n!! WARNING: An engine may be needed (not implemented yet).\n\n";
+  } else if (epd == "8/8/8/p7/b2Q4/K7/p1r5/rk3n1n w - -" ||       // bm #15 (not yet)
+             epd == "8/p6p/7p/p6p/b2Q3p/K6p/p1r5/rk3n1n w - -") { // bm #130 (not yet)
+    excludeFrom = "a3";
+    excludeAllowingFrom = "a1 h1";
+    excludeAllowingSANs = "Kd1 Kd2";
+    excludeToCapturable = true;
   }
   // clang-format on
 }
