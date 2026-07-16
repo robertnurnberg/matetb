@@ -349,6 +349,13 @@ inline void Options::fill_exclude_options() {
       openingMoves = "c2d1";
     excludeFrom = "d1";
     excludeToAttacked = true;
+  } else if (epd == "k7/1p6/8/7P/1p6/8/ppp1p3/rqrbK3 b - -" || // bm #-42
+             epd == "k7/1p6/8/7P/1p6/8/pppKp3/rqrb4 w - -") {  // bm #43
+    if (epd.find(" w ") != std::string::npos)
+      openingMoves = "d2e1";
+    excludeFrom = "e1";
+    excludePromotionTo = "rbn";
+    excludeToCapturable = true;
   } else if (epd == "8/1p6/8/3p3k/3p1Q2/8/pp1p4/rrbK4 b - -" || // bm #-45
              epd == "8/1p6/8/3p3k/3p4/6Q1/pp1p4/rrbK4 w - -") { // bm #46
     excludeFrom = "d1";
