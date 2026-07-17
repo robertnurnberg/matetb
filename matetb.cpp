@@ -53,6 +53,14 @@ void MateTB::initialize_tb() {
         q.push(std::pair<PackedBoard, int>(child, depth + 1));
       }
     }
+#if 1
+    auto board = Board::Compact::decode(pfen);
+    std::string fen = board.getFen(false);
+    if (fen.find("q") != std::string::npos || count > 10000000) {
+      std::cout << fen << std::endl;
+      std::exit(1);
+    }
+#endif
   }
   auto toc = std::chrono::high_resolution_clock::now();
   double duration =
