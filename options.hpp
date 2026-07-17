@@ -435,6 +435,16 @@ inline void Options::fill_exclude_options() {
     excludeTo = "h1";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "b3 h5 h4";
+  } else if (epd == "8/6p1/5p1p/1p1p1P1P/1p1p1P2/pP1P1P2/P1k1B3/4K3 w - -" || // bm #30
+             epd == "8/1p1p2p1/5p1p/5P1P/1p1p1P2/pP1P1P2/P1k5/4KB2 b - -" ||  // bm #-81
+             epd == "8/1p1p2p1/5p1p/5P1P/1p1p1P2/pP1P1P2/P1k1B3/4K3 w - -") { // bm #82
+    excludeFrom = "c2 a2 b3 d3 f3 f4 f5";
+    excludeTo = "b4 b5 d4 d5 f6";
+    excludeAllowingTo = "a4 b3 b4 c4 d4 d3 d2 d1 f3 f4 f5 g4 f1 g1 h1";
+    excludeAllowingFrom = "b4 b5 d4 d5 f6";
+    excludeAllowingMoves = "a2a1q a2a1r a2a1b a2a1n a2b1q a2b1r a2b1b a2b1n";
+    excludePromotionTo = "rbn";
+    excludeToCapturable = true;
   } else if (epd == "8/8/8/8/NK6/1B1N4/2rpn1pp/2bk1brq w - -" ||      // bm #7
              epd == "8/7p/8/8/NK6/1B1N4/2rpn1pp/2bk1brq w - -" ||     // bm #27
              epd == "8/5ppp/5p2/K7/N7/1B1N4/2rpn1pp/2bk1brq b - -" || // bm #-86
