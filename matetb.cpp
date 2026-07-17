@@ -44,6 +44,13 @@ void MateTB::initialize_tb() {
       std::cout << "Progress: " << count << " (d" << depth << ")\r"
                 << std::flush;
     auto board = Board::Compact::decode(pfen);
+#if 1
+    std::string fen = board.getFen(false);
+    if (fen.find("q") != std::string::npos || count > 1000000) {
+      std::cout << fen << std::endl;
+      std::exit(1);
+    }
+#endif
     Movelist legal_moves;
     movegen::legalmoves(legal_moves, board);
     score_t score =
