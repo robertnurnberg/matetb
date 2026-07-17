@@ -391,6 +391,15 @@ inline void Options::fill_exclude_options() {
     excludeTo = "a1 g3";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "h5";
+  } else if (epd == "7K/7p/3p1pp1/6pr/4n1pb/3N1bk1/4prn1/4B1RR b - -" || // bm #-60
+             epd == "7K/7p/3p1pp1/B5pr/4n1pb/3N1bk1/4prn1/6RR w - -") {  // bm #61
+    if (epd.find(" w ") != std::string::npos)
+      openingMoves = "a5e1";
+    excludeFrom = "g1 h1";
+    excludeTo = "h2 g3 g5 f6 f5 f4 d6 d5 d4";
+    excludeAllowingFrom = "e2 f2 f3 g2 g3 g4 h4";
+    excludeAllowingTo = "d3";
+    excludeToCapturable = true;
   } else if (epd == "4R3/1n1p4/3n4/8/8/p4p2/7p/5K1k w - -" ||     // bm #20
              epd == "4R3/1n1p1p2/3n4/8/8/p4p2/7p/5K1k w - -" ||   // bm #32
              epd == "8/pn1p1p1p/p2n4/8/8/p4p2/7p/4RK1k b - -" ||  // bm #-68
