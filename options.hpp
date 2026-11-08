@@ -356,6 +356,14 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "e1";
     excludePromotionTo = "rbn";
     excludeToCapturable = true;
+  } else if (epd == "8/8/8/2K5/p7/1p5p/rp3ppr/bQ1N1bqk b - -" ||    // bm #-10
+             epd == "8/8/8/8/pK6/1p5p/rp3ppr/bQ1N1bqk w - -" ||     // bm #11
+             epd == "8/5p2/7p/2K5/p7/1p5p/rp3ppr/bQ1N1bqk b - -" || // bm #-42
+             epd == "8/5p2/7p/8/pK6/1p5p/rp3ppr/bQ1N1bqk w - -") {  // bm #43
+    excludeFrom = "b1";
+    excludeTo = "a1 a2 a4 b2 b3 f1 g2 h3 h2";
+    excludeAllowingFrom = "a1 b2 f2 g1 g2 h1 h2 h3";
+    excludeAllowingCapture = true;
   } else if (epd == "8/1p6/8/3p3k/3p1Q2/8/pp1p4/rrbK4 b - -" || // bm #-45
              epd == "8/1p6/8/3p3k/3p4/6Q1/pp1p4/rrbK4 w - -") { // bm #46
     excludeFrom = "d1";
