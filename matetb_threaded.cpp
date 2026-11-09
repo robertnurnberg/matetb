@@ -71,11 +71,13 @@ score_t MateTB::spawn_allowed_children(const PackedBoard &pfen,
 void MateTB::initialize_tb() {
   auto tic = std::chrono::high_resolution_clock::now();
   std::cout << "Create the allowed part of the game tree ..." << std::endl;
+  std::atomic<size_t> count = 0, processed = 0;
+  std::atomic<bool> too_many = false;
   std::vector<PackedBoard> current_level = {Board::Compact::encode(root_pos)};
+  fen2index.emplace(current_level[0], index_t(count++));
   std::vector<std::pair<PackedBoard, score_t>> mate_score;
   std::mutex mate_score_mutex;
   int depth = 0;
-  std::atomic<size_t> count = 0;
   for (; !current_level.empty() && depth <= max_depth; depth++) {
     std::vector<PackedBoard> next_level;
     std::mutex next_level_mutex;
@@ -87,30 +89,39 @@ void MateTB::initialize_tb() {
       std::span<PackedBoard> batch(current_level.begin() + i,
                                    current_level.begin() + batch_end);
       pool.enqueue([this, batch, &next_level, &next_level_mutex, &mate_score,
-                    &mate_score_mutex, &count, depth]() {
+                    &mate_score_mutex, &count, &processed, &too_many,
+                    depth]() {
         std::vector<PackedBoard> local_next_level;
         std::vector<std::pair<PackedBoard, score_t>> local_mate_score;
         for (const auto &pfen : batch) {
-          size_t count_check;
-          bool is_new_entry = fen2index.lazy_emplace_l(
-              pfen, [](index_map_t::value_type &) {},
-              [&pfen, &count,
-               &count_check](const index_map_t::constructor &ctor) {
-                ctor(std::move(pfen), count_check = count++);
-              });
-          if (!is_new_entry)
-            continue;
+          if (too_many)
+            break;
           std::vector<PackedBoard> children;
           score_t score = spawn_allowed_children(pfen, children);
           if (score) {
             local_mate_score.push_back({pfen, score});
-          } else {
-            local_next_level.insert(local_next_level.end(), children.begin(),
-                                    children.end());
+          } else if (depth < max_depth) {
+            for (const PackedBoard &child : children) {
+              size_t count_check;
+              bool is_new_entry = fen2index.lazy_emplace_l(
+                  child, [](index_map_t::value_type &) {},
+                  [&child, &count,
+                   &count_check](const index_map_t::constructor &ctor) {
+                    ctor(child, index_t(count_check = count++));
+                  });
+              if (!is_new_entry)
+                continue;
+              if (max_nodes && count_check >= max_nodes) {
+                too_many = true;
+                break;
+              }
+              local_next_level.push_back(child);
+            }
           }
-          if (count_check % 10000 == 0) {
+          const size_t processed_check = ++processed;
+          if (processed_check % 10000 == 0) {
             std::stringstream ss;
-            ss << "Progress: " << count_check << " (d" << depth << ")\r";
+            ss << "Progress: " << count.load() << " (d" << depth << ")\r";
             std::cout << ss.str() << std::flush;
           }
         }
@@ -127,6 +138,8 @@ void MateTB::initialize_tb() {
       });
     }
     pool.wait();
+    if (too_many)
+      abort_too_many_nodes();
     current_level = std::move(next_level);
   }
   auto toc = std::chrono::high_resolution_clock::now();

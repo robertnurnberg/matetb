@@ -25,22 +25,18 @@ public:
 void MateTB::initialize_tb() {
   auto tic = std::chrono::high_resolution_clock::now();
   std::cout << "Create the allowed part of the game tree ..." << std::endl;
-  int count = 0, depth = 0;
+  size_t count = 0, processed = 0;
+  int depth = 0;
   std::queue<std::pair<PackedBoard, int>> q;
-  q.push(std::pair<PackedBoard, int>(Board::Compact::encode(root_pos), depth));
+  PackedBoard root = Board::Compact::encode(root_pos);
+  fen2index[root] = count++;
+  q.push(std::pair<PackedBoard, int>(root, depth));
   while (!q.empty()) {
     auto pair = q.front();
+    q.pop();
     const PackedBoard &pfen = pair.first;
     depth = pair.second;
-    if (depth > max_depth) {
-      depth--;
-      break;
-    }
-    q.pop();
-    if (fen2index.count(pfen)) // is pfen already a key in the map?
-      continue;
-    fen2index[pfen] = count++;
-    if (count % 1000 == 0)
+    if (++processed % 1000 == 0)
       std::cout << "Progress: " << count << " (d" << depth << ")\r"
                 << std::flush;
     auto board = Board::Compact::decode(pfen);
@@ -73,9 +69,16 @@ void MateTB::initialize_tb() {
       if (onlyMove.empty() && !allowed_move(board, move))
         continue;
       board.makeMove<true>(move);
-      q.push(std::pair<PackedBoard, int>(Board::Compact::encode(board),
-                                         depth + 1));
+      PackedBoard child = Board::Compact::encode(board);
       board.unmakeMove(move);
+      if (depth + 1 > max_depth)
+        continue;
+      if (fen2index.emplace(child, count).second) {
+        count++;
+        if (max_nodes && count > max_nodes)
+          abort_too_many_nodes();
+        q.push(std::pair<PackedBoard, int>(child, depth + 1));
+      }
     }
   }
   auto toc = std::chrono::high_resolution_clock::now();
