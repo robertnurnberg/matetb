@@ -89,8 +89,7 @@ void MateTB::initialize_tb() {
       std::span<PackedBoard> batch(current_level.begin() + i,
                                    current_level.begin() + batch_end);
       pool.enqueue([this, batch, &next_level, &next_level_mutex, &mate_score,
-                    &mate_score_mutex, &count, &processed, &too_many,
-                    depth]() {
+                    &mate_score_mutex, &count, &processed, &too_many, depth]() {
         std::vector<PackedBoard> local_next_level;
         std::vector<std::pair<PackedBoard, score_t>> local_mate_score;
         for (const auto &pfen : batch) {
