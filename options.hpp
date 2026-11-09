@@ -20,6 +20,7 @@ public:
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
       excludeAllowingCapture;
   int depth, verbose, concurrency;
+  size_t maxNodes;
   Options()
       : epdStr(""), openingMoves(""), excludeMoves(""), excludeSANs(""),
         restrictTo(""), excludeFrom(""), excludeTo(""), excludeCapturesOf(""),
@@ -27,7 +28,7 @@ public:
         excludeAllowingMoves(""), excludeAllowingSANs(""), outFile(""),
         excludeCaptures(false), excludeToAttacked(false),
         excludeToCapturable(false), excludeAllowingCapture(false),
-        depth(MAX_DEPTH), verbose(0), concurrency(0) {}
+        depth(MAX_DEPTH), verbose(0), concurrency(0), maxNodes(0) {}
   Options(int argc, char **argv, bool use_concurrency = false);
   void fill_exclude_options();
   void print(std::ostream &os) const;
@@ -48,6 +49,10 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
       .action([](const std::string &value) { return std::stoi(value); })
       .help("Maximal depth for the to be constructed game tree (a too low "
             "value means mate cannot be found).");
+  args.add_argument("--maxNodes")
+      .default_value(std::string("0"))
+      .help("Maximal allowed size for the game tree (0 means no limit). "
+            "Program aborts when limit is reached.");
   args.add_argument("--openingMoves")
       .default_value("")
       .help("Comma separated opening lines in UCI notation that specify the "
@@ -134,6 +139,7 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
   }
   epdStr = args.get("epd");
   depth = args.get<int>("depth");
+  maxNodes = std::stoull(args.get<std::string>("maxNodes"));
   openingMoves = args.get("openingMoves");
   excludeMoves = args.get("excludeMoves");
   excludeSANs = args.get("excludeSANs");
@@ -1891,6 +1897,8 @@ inline void Options::print(std::ostream &os) const {
   os << "--epd \"" << epdStr << "\" ";
   if (depth < MAX_DEPTH)
     os << "--depth " << depth << " ";
+  if (maxNodes)
+    os << "--maxNodes " << maxNodes << " ";
   if (!openingMoves.empty())
     os << "--openingMoves " << enclosed_string(openingMoves) << " ";
   if (!excludeMoves.empty())

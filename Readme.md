@@ -33,7 +33,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
+Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
@@ -42,6 +42,7 @@ Optional arguments:
   -v, --version             prints version information and exits
   --epd                     EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
   --depth                   Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 2147483646]
+  --maxNodes                Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
@@ -96,7 +97,7 @@ Matetrack:
 ```
 
 ```
-Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
+Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
@@ -105,6 +106,7 @@ Optional arguments:
   -v, --version             prints version information and exits
   --epd                     EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
   --depth                   Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 2147483646]
+  --maxNodes                Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
   --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
   --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
   --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]

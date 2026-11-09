@@ -139,6 +139,7 @@ protected:
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
       excludeAllowingCapture, needToGenerateResponses;
   int max_depth, verbose;
+  size_t max_nodes;
 
   bool allowed_move(Board &board, Move move) {
     // restrict the mating side's candidate moves, to reduce overall tree size
@@ -197,6 +198,12 @@ protected:
       board.unmakeMove(move);
     }
     return true;
+  }
+
+  void abort_too_many_nodes() const {
+    std::cout << "\nAborted: the game tree has more than " << max_nodes
+              << " positions (--maxNodes)." << std::endl;
+    std::exit(3);
   }
 
   virtual void initialize_tb() = 0;
@@ -258,6 +265,7 @@ public:
     }
     root_pos = join(parts.begin(), parts.begin() + 4);
     max_depth = options.depth;
+    max_nodes = options.maxNodes;
     mating_side = (parts[1] == "b" ? Color::BLACK : Color::WHITE);
     mating_side_to_move = true;
     for (size_t i = 4; i < parts.size() - 1; ++i)
