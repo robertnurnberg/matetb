@@ -11,6 +11,8 @@ import argparse
 import collections
 import json
 
+import mtlib
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -21,12 +23,17 @@ def main():
     for path in args.results:
         for l in open(path):
             d = json.loads(l)
+            mtlib.promote_improved(d)
             p = recs.get(d["fen4"])
             if p is None or "solved" in d or ("solved" not in p and d["cap"] >= p["cap"]):
                 recs[d["fen4"]] = d
     solved = [d for d in recs.values() if "solved" in d]
     print(f"{len(recs)} candidates, {len(solved)} solved")
-    by = collections.Counter(min(abs(d["bm"]) // 10 * 10, 100) for d in solved)
+    for d in solved:
+        if d.get("improved"):
+            print(f"  *** SHORTER MATE: {d['fen4']}  matetrack bm #{d['bm']}, "
+                  f"matetb proves #{d['solved']['mate']} ***")
+    by = collections.Counter(min(abs(mtlib.solved_bm(d)) // 10 * 10, 100) for d in solved)
     print("solved by |bm| decade:", ", ".join(f"{k}+:{v}" for k, v in sorted(by.items())))
     if solved:
         sizes = sorted(d["solved"]["positions"] for d in solved)

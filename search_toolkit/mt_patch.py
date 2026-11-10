@@ -74,22 +74,26 @@ def key_bm(bm):
 # --------------------------------------------------------------------------
 def verify_root(repo, rec, threads):
     s = rec["solved"]
-    epd = f"{rec['fen4']} bm #{rec['bm']};"
+    bm = mtlib.solved_bm(rec)
+    epd = f"{rec['fen4']} bm #{bm};"
     cap = int(s["positions"] * 2 + 1000)
     r = mtlib.run_matetb(repo, epd, s["argv"], cap, threads)
-    return r["status"] == "ok" and r["mate"] == rec["bm"], r
+    if r["status"] == "ok" and r["mate"] == bm and rec.get("improved"):
+        s["pv"] = r["pv"]  # matetrack's PV belongs to the longer mate
+    return r["status"] == "ok" and r["mate"] == bm, r
 
 
 def minimize(repo, rec, threads, tol, squares):
     """Greedy removal of flags (and optionally single squares) that do not matter."""
-    epd = f"{rec['fen4']} bm #{rec['bm']};"
+    bm = mtlib.solved_bm(rec)
+    epd = f"{rec['fen4']} bm #{bm};"
     flags = split_flags(rec["solved"]["argv"])
     base = rec["solved"]["positions"]
     limit = int(base * (1 + tol)) + 1
 
     def ok(fl):
         r = mtlib.run_matetb(repo, epd, join_flags(fl), limit + 1, threads)
-        return r["status"] == "ok" and r["mate"] == rec["bm"] and r["positions"] <= limit
+        return r["status"] == "ok" and r["mate"] == bm and r["positions"] <= limit
 
     changed = True
     while changed:
@@ -205,10 +209,11 @@ def main():
     for path in args.results:
         for l in open(path):
             d = json.loads(l)
-            if "solved" in d and abs(d["bm"]) >= args.min_bm:
+            mtlib.promote_improved(d)
+            if "solved" in d and abs(mtlib.solved_bm(d)) >= args.min_bm:
                 solved[d["fen4"]] = d
     roots = [d for f, d in solved.items()
-             if (f, d["bm"]) not in have and f not in keyed and f not in have4]
+             if (f, mtlib.solved_bm(d)) not in have and f not in keyed and f not in have4]
     print(f"{len(solved)} solved records, {len(roots)} not yet in the repo")
 
     report = []
@@ -219,8 +224,14 @@ def main():
         if ok:
             good.append(d)
         else:
-            report.append(f"VERIFY FAILED root {d['fen4']} bm #{d['bm']}: {r}")
+            report.append(f"VERIFY FAILED root {d['fen4']} bm #{mtlib.solved_bm(d)}: {r}")
     print(f"{len(good)} roots verified")
+    for d in good:
+        if d.get("improved"):
+            msg = (f"SHORTER MATE: {d['fen4']}  matetrack bm #{d['bm']}, "
+                   f"matetb proves #{mtlib.solved_bm(d)} (added with the shorter bm)")
+            report.append(msg)
+            print("  *** " + msg + " ***")
     if args.minimize:
         with cf.ThreadPoolExecutor(args.workers) as ex:
             new_argv = list(ex.map(lambda d: minimize(
@@ -233,17 +244,20 @@ def main():
 
     # ---- children
     entries = collections.OrderedDict()   # (fen4, bm) -> argv
-    for d in sorted(good, key=lambda d: (abs(d["bm"]), d["bm"] < 0)):
-        entries.setdefault((d["fen4"], d["bm"]), tuple(d["solved"]["argv"]))
+    for d in sorted(good, key=lambda d: (abs(mtlib.solved_bm(d)), mtlib.solved_bm(d) < 0)):
+        entries.setdefault((d["fen4"], mtlib.solved_bm(d)), tuple(d["solved"]["argv"]))
     if not args.no_children:
         jobs = []
         for d in good:
             e = mt[d["fen4"]]
+            bm = mtlib.solved_bm(d)
             b = chess.Board(e["fen4"] + " 0 1")
-            if abs(d["bm"]) < 2 and d["bm"] > 0:
+            if abs(bm) < 2 and bm > 0:
                 continue
-            b.push(chess.Move.from_uci(e["pv"][0]))
-            cbm = -(d["bm"] - 1) if d["bm"] > 0 else -d["bm"]
+            # for a shorter mate than matetrack's, follow matetb's own PV
+            pv = (d["solved"].get("pv") if d.get("improved") else None) or e["pv"]
+            b.push(chess.Move.from_uci(pv[0]))
+            cbm = -(bm - 1) if bm > 0 else -bm
             c4 = " ".join(b.fen().split()[:4])
             if abs(cbm) < args.min_bm - 1 or (c4, cbm) in have or c4 in keyed:
                 continue

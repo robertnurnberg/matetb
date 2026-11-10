@@ -4,7 +4,8 @@
 For each candidate a ladder of restriction sets is derived from its PV (see
 mtlib.ladder) and tried from the most to the least restrictive. A candidate is
 *solved* if some restricted tree completes within --max-nodes and proves
-exactly the matetrack mate length.
+exactly the matetrack mate length, or a *shorter* one (reported loudly; the proven
+mate then becomes the position's bm).
 
 The results file is JSON lines and resumable. Run the script repeatedly with
 increasing --max-nodes: solved candidates are never revisited, candidates
@@ -33,6 +34,7 @@ def load_done(path):
                 d = json.loads(l)
             except json.JSONDecodeError:
                 continue
+            mtlib.promote_improved(d)  # shorter mates from older runs count as solved
             prev = done.get(d["fen4"])
             # keep the most informative record: solved > larger cap
             if prev is None or "solved" in d or (
@@ -50,8 +52,13 @@ def solve_candidate(repo, entry, feats, cap, threads, timeout):
             k: r[k] for k in ("status", "positions", "mate", "secs")}))
         if r["status"] != "ok":
             break  # all weaker sets contain this tree: they can only be larger
-        if r["mate"] == entry["bm"]:
-            rec["solved"] = dict(keys=keys, argv=argv, positions=r["positions"])
+        if r["mate"] == entry["bm"] or mtlib.is_shorter(r["mate"], entry["bm"]):
+            # a shorter mate than matetrack's bm is a success too: the proven
+            # mate becomes the new bm of the position
+            rec["solved"] = dict(keys=keys, argv=argv, positions=r["positions"],
+                                 mate=r["mate"], pv=r["pv"])
+            if r["mate"] != entry["bm"]:
+                rec["improved"] = True
             break
     return rec
 
@@ -87,6 +94,10 @@ def main():
     have, keyed = mtlib.existing_keys(args.repo)
     have4 = {f for f, _ in have}
     done = load_done(args.out)
+    nrec = sum(1 for d in done.values() if d.get("improved"))
+    if nrec:
+        print(f"{nrec} shorter mates than matetrack's bm found in earlier runs "
+              f"(counted as solved)", flush=True)
 
     todo = []
     for e in mtlib.parse_epd(args.matetrack):
@@ -115,7 +126,7 @@ def main():
         print("WARNING: workers*max-nodes may exceed available memory; "
               "reduce --workers or --max-nodes", flush=True)
 
-    t0, nsolved = time.time(), 0
+    t0, nsolved, nimproved = time.time(), 0, 0
     with open(args.out, "a") as fo, cf.ThreadPoolExecutor(args.workers) as ex:
         futs = {ex.submit(solve_candidate, args.repo, e, f, args.max_positions,
                           args.threads, args.timeout): e for _, e, f in todo}
@@ -125,12 +136,20 @@ def main():
             fo.flush()
             if "solved" in rec:
                 nsolved += 1
-                print(f"  SOLVED #{rec['bm']:>4} {rec['solved']['positions']:>10} pos  "
-                      f"{rec['fen4']}", flush=True)
+                if rec.get("improved"):
+                    nimproved += 1
+                    print(f"  *** SHORTER MATE: matetb proves #{rec['solved']['mate']} "
+                          f"(matetrack bm #{rec['bm']}) with {rec['solved']['positions']:>10} pos  "
+                          f"{rec['fen4']}  ***", flush=True)
+                else:
+                    print(f"  SOLVED #{rec['bm']:>4} {rec['solved']['positions']:>10} pos  "
+                          f"{rec['fen4']}", flush=True)
             if n % 200 == 0:
-                print(f"[{n}/{len(todo)}] {time.time()-t0:.0f}s, {nsolved} solved so far",
+                print(f"[{n}/{len(todo)}] {time.time()-t0:.0f}s, {nsolved} solved so far"
+                      + (f" ({nimproved} with a shorter mate than matetrack)" if nimproved else ""),
                       flush=True)
-    print(f"done: {nsolved} solved of {len(todo)} in {time.time()-t0:.0f}s")
+    print(f"done: {nsolved} solved of {len(todo)} in {time.time()-t0:.0f}s"
+          + (f"; {nimproved} with a shorter mate than matetrack's bm" if nimproved else ""))
 
 
 if __name__ == "__main__":

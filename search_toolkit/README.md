@@ -61,6 +61,19 @@ skipped. `mt_stats.py` splits the unsolved ones into "exceeds the cap" (try a la
 "near misses" (a restricted tree finished but proved a longer mate, or none: the flags were too
 strong and the weaker set too big; hand-tune `--excludeTo`, `--excludeMoves`, `--openingMoves`...).
 
+## Shorter mates than matetrack's bm
+
+If a restricted tree proves a mate that is *shorter* than matetrack's `bm` (same side mating), this
+counts as solved. `mt_search.py` prints it as `*** SHORTER MATE: matetb proves #N (matetrack bm #M) ***`,
+the record in `results.jsonl` gets `"improved": true` and the proven mate, and `mt_patch.py` adds the
+position with the proven mate as its `bm` (epd line, `options.hpp` block comment, and the child
+position, which follows matetb's own PV since matetrack's PV belongs to the longer mate). Such cases
+are also listed in `mt_stats.py` and `report.txt`; please report them to the matetrack maintainers.
+Result files from older runs are handled too: such records, which were stored as unsolved, are
+promoted automatically when the file is read, so resuming a run does not lose them.
+Note the ladder stops at the first (strictest) tree that proves a mate no longer than `bm`; a weaker
+flag set might prove an even shorter one.
+
 ## mt_patch.py
 
 * re-verifies every solve with the real binary;
