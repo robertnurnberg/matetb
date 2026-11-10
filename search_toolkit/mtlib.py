@@ -240,14 +240,47 @@ def run_matetb(repo, epd, argv, max_positions, threads=1, timeout=None):
                     msg=(out + p.stderr)[-300:])
     fm = re.search(r"Found (\d+) positions", out)
     positions = int(fm.group(1)) if fm else 0
-    mate = None
+    mate, pv = None, None
     lines = out.split("\n")
     for i, l in enumerate(lines):
         if l.startswith("Matetrack:") and i + 1 < len(lines):
             mm = re.search(r"bm #(-?\d+);", lines[i + 1])
             if mm:
                 mate = int(mm.group(1))
-    return dict(status="ok", positions=positions, mate=mate, secs=secs)
+            pm = re.search(r"PV:\s*([^;]*);", lines[i + 1])
+            if pm:
+                pv = pm.group(1).split()
+    return dict(status="ok", positions=positions, mate=mate, pv=pv, secs=secs)
+
+
+def is_shorter(mate, bm):
+    """True if a proven mate is strictly shorter than bm (same side mating)."""
+    return bool(mate) and (mate > 0) == (bm > 0) and abs(mate) < abs(bm)
+
+
+def solved_bm(rec):
+    """The mate length to use for a solved record: the proven one (it may be
+    shorter than matetrack's bm), falling back to bm for older records."""
+    return rec["solved"].get("mate") or rec["bm"]
+
+
+def promote_improved(rec):
+    """Older result files (before shorter mates counted as success) list such cases
+    as unsolved, with the proven mate in 'tried'. Promote them to solved records.
+    Returns True if rec was changed."""
+    if "solved" in rec:
+        return False
+    best = None
+    for t in rec.get("tried", []):
+        if t.get("status") == "ok" and is_shorter(t.get("mate"), rec["bm"]):
+            if best is None or abs(t["mate"]) < abs(best["mate"]):
+                best = t
+    if best is None:
+        return False
+    rec["solved"] = dict(keys=best["keys"], argv=best["argv"],
+                         positions=best["positions"], mate=best["mate"])
+    rec["improved"] = True
+    return True
 
 
 def mem_available_gb():
