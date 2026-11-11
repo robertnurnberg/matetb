@@ -1,7 +1,7 @@
 # matetb search toolkit
 
 Finds positions of `matetrackpv.epd` that `matetb` can solve with PV-derived restrictions and
-turns them into a patch for `matetb.epd` / `options.hpp`. The scripts call the real `matetb` /
+turns them into a patch for `matetb.epd` / `options.hpp`. The scripts run `make -j` in `--repo` first and call the real `matetb` /
 `matetb_threaded` binaries (`--maxNodes` aborts a tree that gets too big). Needs `pip install chess`.
 
     cd ~/matetb && make -j
