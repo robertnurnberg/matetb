@@ -3,6 +3,7 @@ restriction sets, and a runner for the real matetb / matetb_threaded binaries.""
 import os
 import re
 import subprocess
+import sys
 
 import chess
 
@@ -120,6 +121,18 @@ def ladder(f):
             seen.add(tuple(keys))
             out.append([x for k in keys for x in A[k]])
     return out
+
+
+def prepare(repo):
+    """Compile the binaries (make does nothing if they are up to date) and check that
+    they support --maxNodes."""
+    p = subprocess.run(["make", "-j"], cwd=repo, capture_output=True, text=True)
+    if p.returncode:
+        sys.exit("make failed:\n" + (p.stdout + p.stderr)[-2000:])
+    for exe in ("matetb", "matetb_threaded"):
+        h = subprocess.run([os.path.join(repo, exe), "--help"], capture_output=True, text=True)
+        if "--maxNodes" not in h.stdout + h.stderr:
+            sys.exit(f"{exe} in {repo} does not support --maxNodes: update the sources")
 
 
 def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
