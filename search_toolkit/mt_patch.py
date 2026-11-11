@@ -117,6 +117,7 @@ def main():
     ap.add_argument("--min-bm", type=int, default=3)
     ap.add_argument("--minimize", action="store_true")
     args = ap.parse_args()
+    mtlib.prepare(args.repo)
     os.makedirs(args.out_dir, exist_ok=True)
 
     matetrack = {e["fen4"]: e for e in mtlib.parse_epd(args.matetrack)}

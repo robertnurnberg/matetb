@@ -57,9 +57,7 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="stop after this many candidates")
     args = ap.parse_args()
 
-    for exe in ("matetb", "matetb_threaded"):
-        if not os.path.exists(os.path.join(args.repo, exe)):
-            sys.exit(f"{exe} not found in {args.repo}; run make there first")
+    mtlib.prepare(args.repo)
     in_repo = {e["fen4"] for e in mtlib.parse_epd(os.path.join(args.repo, "matetb.epd"))}
     done = {}
     if os.path.exists(args.out):
