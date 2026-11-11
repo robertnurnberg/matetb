@@ -135,6 +135,7 @@ def main():
             for d, argv in zip(roots, pool.map(lambda d: minimize(args.repo, d, args.threads),
                                                roots)):
                 d["argv"] = argv
+        print("Minimization complete.")
 
     entries = collections.OrderedDict(((d["fen4"], d["mate"]), d["argv"]) for d in roots)
     children = []
@@ -155,6 +156,8 @@ def main():
         c4, cbm, d = c
         return mtlib.run_matetb(args.repo, f"{c4} bm #{cbm};", d["argv"],
                                 2 * d["positions"] + 1000, args.threads)
+
+    print(f"Checking {len(children)} child positions...")
     with cf.ThreadPoolExecutor(args.workers) as pool:
         for (c4, cbm, d), r in zip(children, pool.map(check, children)):
             if r["status"] == "ok" and r["mate"] == cbm:
