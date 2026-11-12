@@ -2508,6 +2508,21 @@ inline void Options::fill_exclude_options() {
     excludePromotionTo = "rbn";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "a1 b1 a2 b2 a3 b5 f5 b6 f6 c7 g7";
+  } else if (epd == "2Q4K/pr6/k7/1p6/1P6/8/8/8 b - -" || // bm #-15
+             epd == "2Q4K/pr6/k7/1p6/8/8/1P6/8 w - -") { // bm #16
+    excludeCaptures = true;
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "b5 a7";
+  } else if (epd == "4Kb1r/4p1p1/4P1Pp/7P/8/3N2p1/5brp/2NRnkqn b - -" || // bm #-15
+             epd == "5b1r/4pKp1/4P1Pp/7P/8/3N2p1/5brp/2NRnkqn w - -") {  // bm #16
+    excludeFrom = "d3 h5 e6 g6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "e1 g1 h1 g2 h2 g3 h6 e7 g7 f8";
+  } else if (epd == "7q/pp3b1p/1r1P1r2/8/1P1K1P2/4n3/pPkB1Ppn/2Q3b1 b - -" || // bm #-15
+             epd == "7q/pp3b1p/1r1P1r2/8/1P1K1P2/4n3/pPkB1Ppn/4Q1b1 w - -") { // bm #16
+    excludeFrom = "b2 f2 b4 d4 f4 d6";
+    excludeToCapturable = true;
+    excludeAllowingFrom = "g1 a2 g2 h2 e3 b6 f6 a7 b7 f7 h7 h8";
   } else if (epd == "8/pp6/qp6/rk1P4/bP6/Kp1RP1P1/1P2P3/7B b - -" || // bm #-16
              epd == "8/pp6/qp6/rk1P4/bP6/KpR1P1P1/1P2P3/7B w - -") { // bm #17
     excludeFrom = "b2 e2 a3 e3 g3 b4 d5";
@@ -2563,6 +2578,11 @@ inline void Options::fill_exclude_options() {
     excludeCaptures = true;
     excludeAllowingCapture = true;
     excludeAllowingFrom = "c3 a6 a7 b7 d7 a8 b8";
+  } else if (epd == "8/1p4K1/4NN2/pp6/qnp5/1pkp4/bppn4/rrb5 b - -" || // bm #-16
+             epd == "8/1p6/4NNK1/pp6/qnp5/1pkp4/bppn4/rrb5 w - -") {  // bm #17
+    excludeFrom = "e6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a1 b1 c1 a2 b2 c2 b3 c3 d3 c4 b5";
   } else if (epd == "8/p7/8/8/8/3p1b1N/pp1K4/qk6 b - -" ||  // bm #-17
              epd == "8/p7/8/8/8/3p1b2/pp1K1N2/qk6 w - -") { // bm #18
     excludeFrom = "d2";
@@ -2621,6 +2641,16 @@ inline void Options::fill_exclude_options() {
     excludePromotionTo = "rbn";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "b3 b4 b5 b6 b7 g7 a8 h8";
+  } else if (epd == "8/7B/8/1pR1P1K1/p2P2P1/rp3P2/pk6/b7 b - -" ||  // bm #-18
+             epd == "8/8/8/1pR1P1K1/p2P2P1/rp1B1P2/pk6/b7 w - -") { // bm #19
+    excludeFrom = "f3 d4 g4 e5";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a1 a2 a3 b3 a4";
+  } else if (epd == "k3Qn2/7r/2K5/8/8/7p/3p3p/1b6 b - -" || // bm #-18
+             epd == "k4n2/7r/2K5/8/8/7p/3pQ2p/1b6 w - -") { // bm #19
+    excludeFrom = "c6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "d2 h2 h3 f8";
   } else if (epd == "K4bkR/1r4p1/1qb2pn1/3p2NR/7r/7R/1p5n/QRRRRRRR b - -" || // bm #-19
              epd == "K4bk1/1r4p1/1qb2pnR/3p2NR/7r/7R/1p5n/QRRRRRRR w - -") { // bm #20
     excludeFrom = "g5 a8";
@@ -2711,6 +2741,11 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "a3";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "c1 b2 c2 b3";
+  } else if (epd == "8/8/rp3K2/4P3/1N2kp2/2R3P1/1PBb4/q7 b - -" || // bm #-25
+             epd == "8/8/rp3K2/4P3/4kp2/2RN2P1/1PBb4/q7 w - -") {  // bm #26
+    excludeFrom = "b2 g3 e5 f6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a1 d2 f4 a6 b6";
   } else if (epd == "8/8/2p5/2p5/p1p5/rbp5/p1p1Q3/n1K4k b - -" || // bm #-25
              epd == "8/8/2p5/2p5/p1p5/rbp5/p1p2Q2/n1K4k w - -" || // bm #26
              epd == "8/2p5/2p5/8/p1p5/rbp3Q1/p1p5/n1K4k b - -" || // bm #-27
@@ -2764,6 +2799,12 @@ inline void Options::fill_exclude_options() {
              epd == "8/6B1/4B3/8/1B2p3/4p3/4p1pp/2k1Kbrr w - -") {  // bm #31
     excludeCaptures = true;
     excludeAllowingCapture = true;
+  } else if (epd == "4Bb1k/p1p1p1p1/1pP1P1P1/1P4p1/8/8/6p1/6Kb b - -" || // bm #-30
+             epd == "5b1k/p1p1pBp1/1pP1P1P1/1P4p1/8/8/6p1/6Kb w - -") {  // bm #31
+    excludeFrom = "g1 c6 e6 g6";
+    excludePromotionTo = "rbn";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "h1 g2 c7 e7 g7 f8";
   } else if (epd == "5n2/B3K3/2p3p1/4k3/7P/3bNNP1/2Prn1P1/1q6 b - -" ||   // bm #-21
              epd == "5n2/B3K3/2p3p1/4k1N1/7P/3bN1P1/2Prn1P1/1q6 w - -" || // bm #22
              epd == "5n2/B3K3/2p2Np1/4k3/6NP/3b2P1/2Prn1P1/1q6 b - -" ||  // bm #-29
