@@ -2248,6 +2248,36 @@ inline void Options::fill_exclude_options() {
     excludePromotionTo = "qrbn";
     excludeAllowingCapture = true;
     excludeAllowingFrom = "b5 b6 b7";
+  } else if (epd == "1b4k1/r4p2/5PpQ/8/8/8/8/7K b - -" ||   // bm #-11
+             epd == "1b4k1/r4p2/5Pp1/8/8/8/8/2Q4K w - -") { // bm #12
+    excludeFrom = "f6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "f7 g8";
+  } else if (epd == "2B5/8/1p3P2/QP1PP1Bp/2p1p2P/P1P1p1p1/4Pprk/5Kbq b - -" ||  // bm #-11
+             epd == "2B5/Q7/1p3P2/1P1PP1Bp/2p1p2P/P1P1p1p1/4Pprk/5Kbq w - -") { // bm #12
+    excludeFrom = "f1 e2 a3 c3 h4 b5 e5 f6 c8";
+    excludePromotionTo = "qrb";
+    excludeAllowingFrom = "g1 h1 f2 g2 e3 g3 c4 h5";
+  } else if (epd == "5brk/4p1nb/3pP3/5p2/5P2/8/R7/B3K3 b - -" || // bm #-11
+             epd == "R4brk/4p1nb/3pP3/5p2/5P2/8/8/B3K3 w - -") { // bm #12
+    excludeFrom = "f4 e6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "f5 e7 g7 f8 g8 h8";
+  } else if (epd == "6B1/8/2R4K/8/8/pp6/pk6/b7 b - -" || // bm #-11
+             epd == "6B1/8/8/7K/2R5/pp6/pk6/b7 b - -" || // bm #-11
+             epd == "8/8/2R1B2K/8/8/pp6/pk6/b7 w - -" || // bm #12
+             epd == "8/8/4B3/7K/2R5/pp6/pk6/b7 w - -") { // bm #12
+    excludeCaptures = true;
+    excludeAllowingFrom = "a1 a2 a3";
+  } else if (epd == "6R1/5p2/5p2/5p2/1p3p2/1p3P2/1p1K4/bk5N b - -" || // bm #-11
+             epd == "8/5p2/5p2/5p2/1p3p2/1p3P2/1p1K2R1/bk5N w - -") { // bm #12
+    excludeFrom = "f3";
+    excludeCaptures = true;
+    excludeAllowingFrom = "a1 b2 b3 f4 f5 f6 f7";
+  } else if (epd == "8/6K1/2N5/6pp/4ppnq/4pkp1/4nprb/5bb1 b - -" || // bm #-11
+             epd == "7K/8/2N5/6pp/4ppnq/4pkp1/4nprb/5bb1 w - -") {  // bm #12
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "f1 g1 f2 g2 h2 e3 f3 g3 e4 f4 g5";
   } else if (epd == "8/8/1p6/1p6/1p6/1p3N2/pppbK3/rbk5 b - -" || // bm #-12
              epd == "8/8/1p6/1p6/1p6/1p6/pppbK3/rbk3N1 w - -") { // bm #13
     excludeFrom = "e2";
@@ -2418,6 +2448,30 @@ inline void Options::fill_exclude_options() {
     excludeCaptures = true;
     excludeAllowingCapture = true;
     excludeAllowingFrom = "a7 a8 b8";
+  } else if (epd == "2B5/k7/p1K5/p7/P7/8/8/8 b - -" ||   // bm #-13
+             epd == "2r5/k2P4/p1K5/p7/P7/8/8/8 w - -") { // bm #14
+    excludePromotionTo = "rn";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a5 a6 c8";
+  } else if (epd == "8/3p1B2/3B4/p2p1p2/P2kbp2/3p1p2/PK1P1P2/8 b - -" || // bm #-13
+             epd == "8/3p1B2/3B4/p2p1p2/P2kbp2/K2p1p2/P2P1P2/8 w - -") { // bm #14
+    excludeFrom = "a2 d2 f2 a4 d6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "d3 f3 f4 a5 d5 d7";
+  } else if (epd == "8/8/5pN1/8/1b4P1/8/p1K5/k7 b - -" || // bm #-13
+             epd == "7N/8/5p2/8/1b4P1/8/p1K5/k7 w - -") { // bm #14
+    excludePromotionTo = "qrbn";
+    excludeAllowingFrom = "a1 a2";
+  } else if (epd == "N5B1/8/1n6/8/6p1/3b2p1/3K1prp/5kbQ b - -" ||  // bm #-13
+             epd == "6B1/2N5/1n6/8/6p1/3b2p1/3K1prp/5kbQ w - -") { // bm #14
+    excludeFrom = "d2";
+    excludeAllowingFrom = "f1 g1 f2 g3 g4";
+  } else if (epd == "Q7/8/8/7N/8/1pp3pp/1qr1p2p/4K2k b - -" || // bm #-13
+             epd == "8/P7/8/7N/8/1pp3pp/1qr1p2p/4K2k w - -") { // bm #14
+    excludeFrom = "e1";
+    excludePromotionTo = "rbn";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "b2 c2 e2 h2 b3 c3 h3";
   } else if (epd == "8/8/8/6r1/8/8/p1p5/k1KbB3 b - -" ||              // bm #-6
              epd == "8/8/8/6r1/8/6B1/p1p5/k1Kb4 w - -" ||             // bm #7
              epd == "k7/2Q5/2p5/2p5/2p5/6p1/2p1ppp1/2Kbrqrn b - -" || // bm #-14
