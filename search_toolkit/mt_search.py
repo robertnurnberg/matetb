@@ -28,8 +28,11 @@ def solve(repo, entry, features, cap, threads, timeout):
     rec = dict(fen4=entry["fen4"], bm=entry["bm"], cap=cap, tried=[])
     for argv in mtlib.ladder(features):
         r = mtlib.run_matetb(repo, epd, argv, cap, threads, timeout)
-        rec["tried"].append(dict(argv=argv, status=r["status"], positions=r["positions"],
-                                 mate=r["mate"]))
+        tried = dict(argv=argv, status=r["status"], positions=r["positions"],
+                     mate=r["mate"])
+        if "error" in r:
+            tried["error"] = r["error"]
+        rec["tried"].append(tried)
         if r["status"] != "ok":
             break  # weaker sets have bigger trees
         if r["mate"] == entry["bm"] or mtlib.shorter(r["mate"], entry["bm"]):
@@ -66,6 +69,8 @@ def main():
                 d = json.loads(line)
             except json.JSONDecodeError:  # a line cut off by an interrupted run
                 continue
+            if any(t.get("status") == "fail" for t in d.get("tried", [])):
+                continue
             old = done.get(d["fen4"])
             if old is None or "mate" in d or ("mate" not in old and d["cap"] >= old["cap"]):
                 done[d["fen4"]] = d
@@ -86,7 +91,7 @@ def main():
     print(f"{len(todo)} candidates, {args.workers} workers x {args.threads} threads, "
           f"memory up to ~{est:.0f} GB", flush=True)
 
-    t0, solved, shorter = time.time(), 0, 0
+    t0, solved, shorter, failed = time.time(), 0, 0, 0
     with open(args.out, "a") as out, cf.ThreadPoolExecutor(args.workers) as pool:
         futures = [pool.submit(solve, args.repo, e, f, args.max_nodes, args.threads,
                                args.timeout) for _, e, f in todo]
@@ -104,11 +109,16 @@ def main():
                     print(f"  *** SHORTER MATE: matetb proves #{rec['mate']}, matetrack "
                           f"has #{rec['bm']} ({rec['positions']} positions): "
                           f"{rec['fen4']} ***", flush=True)
+            elif any(t["status"] == "fail" for t in rec["tried"]):
+                failed += 1
+                err = next(t.get("error", "fail") for t in rec["tried"]
+                           if t["status"] == "fail")
+                print(f"  FAILED ({err}): {rec['fen4']}", flush=True)
             if n % 100 == 0:
                 print(f"[{n}/{len(todo)}] {time.time() - t0:.0f}s, {solved} solved, "
-                      f"{shorter} shorter", flush=True)
-    print(f"done: {solved} solved ({shorter} with a shorter mate) of {len(todo)} "
-          f"in {time.time() - t0:.0f}s")
+                      f"{shorter} shorter, {failed} failed", flush=True)
+    print(f"done: {solved} solved ({shorter} with a shorter mate), {failed} failed "
+          f"of {len(todo)} in {time.time() - t0:.0f}s")
     print(mtlib.peak_memory_report(args.workers))
 
 
