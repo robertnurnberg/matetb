@@ -16,6 +16,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 
 import chess
@@ -52,6 +53,8 @@ def minimize(repo, rec, threads):
     for f in list(flags):
         trial = [x for x in flags if x != f]
         r = mtlib.run_matetb(repo, epd, join_flags(trial), rec["positions"] + 1, threads)
+        if r["status"] == "fail":
+            raise RuntimeError(f"minimize failed ({r.get('error', 'fail')}): {epd}")
         if r["status"] == "ok" and r["mate"] == rec["mate"] and r["positions"] <= rec["positions"]:
             flags = trial
     return join_flags(flags)
@@ -125,16 +128,24 @@ def main():
     roots = {}
     for path in args.results:
         for line in open(path):
-            d = json.loads(line)
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:  # a line cut off by an interrupted run
+                continue
             if "mate" in d and abs(d["mate"]) >= args.min_bm and d["fen4"] not in have:
                 roots[d["fen4"]] = d
     roots = sorted(roots.values(), key=lambda d: key_bm(d["mate"]))
     print(f"{len(roots)} solved positions not yet in the repo")
     if args.minimize:
         with cf.ThreadPoolExecutor(args.workers) as pool:
-            for d, argv in zip(roots, pool.map(lambda d: minimize(args.repo, d, args.threads),
-                                               roots)):
-                d["argv"] = argv
+            futs = {pool.submit(minimize, args.repo, d, args.threads): d for d in roots}
+            try:
+                for fut in cf.as_completed(futs):
+                    futs[fut]["argv"] = fut.result()
+            except RuntimeError as e:
+                print(f"error: {e}", file=sys.stderr, flush=True)
+                pool.shutdown(wait=False, cancel_futures=True)
+                sys.exit(1)
         print("Minimization complete.")
 
     entries = collections.OrderedDict(((d["fen4"], d["mate"]), d["argv"]) for d in roots)
@@ -159,7 +170,15 @@ def main():
 
     print(f"Checking {len(children)} child positions...")
     with cf.ThreadPoolExecutor(args.workers) as pool:
-        for (c4, cbm, d), r in zip(children, pool.map(check, children)):
+        futs = {pool.submit(check, c): c for c in children}
+        for fut in cf.as_completed(futs):
+            c4, cbm, d = futs[fut]
+            r = fut.result()
+            if r["status"] == "fail":
+                print(f"error: child check failed ({r.get('error', 'fail')}): "
+                      f"{c4} bm #{cbm}", file=sys.stderr, flush=True)
+                pool.shutdown(wait=False, cancel_futures=True)
+                sys.exit(1)
             if r["status"] == "ok" and r["mate"] == cbm:
                 entries[(c4, cbm)] = d["argv"]
             else:
