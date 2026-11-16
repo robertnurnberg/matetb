@@ -109,6 +109,7 @@ def main():
                       f"{shorter} shorter", flush=True)
     print(f"done: {solved} solved ({shorter} with a shorter mate) of {len(todo)} "
           f"in {time.time() - t0:.0f}s")
+    print(mtlib.peak_memory_report(args.workers))
 
 
 if __name__ == "__main__":

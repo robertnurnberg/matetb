@@ -193,6 +193,7 @@ def main():
     open(os.path.join(args.out_dir, "new.epd"), "w").write("\n".join(lines) + "\n")
     shutil.rmtree(tmp)
     print(f"wrote {args.out_dir}/new_puzzles.patch and new.epd")
+    print(mtlib.peak_memory_report(args.workers))
 
 
 if __name__ == "__main__":

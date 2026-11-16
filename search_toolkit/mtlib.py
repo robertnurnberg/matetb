@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 
 import chess
 
@@ -135,6 +136,19 @@ def prepare(repo):
             sys.exit(f"{exe} in {repo} does not support --maxNodes: update the sources")
 
 
+_peak = dict(kb=0, epd="")
+_peak_lock = threading.Lock()
+
+
+def peak_memory_report(workers):
+    """The largest memory use of any single matetb run so far, and the resulting upper
+    bound for `workers` runs at the same time, as a printable line."""
+    gb = _peak["kb"] / 1024 ** 2
+    return (f"largest memory use of a single matetb run: {gb:.2f} GB "
+            f"({_peak['epd'].split(';')[0]}); upper bound for {workers} workers: "
+            f"{gb * workers:.2f} GB")
+
+
 def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
     """Run matetb (threads == 1) or matetb_threaded with --maxNodes.
 
@@ -145,14 +159,24 @@ def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
     cmd = [os.path.join(repo, exe), "--epd", epd, *argv, "--maxNodes", str(max_nodes)]
     if threads > 1:
         cmd += ["--concurrency", str(threads)]
-    try:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        return dict(status="fail", positions=0, mate=None, pv=None)
-    out = p.stdout.replace("\r", "\n")
-    if p.returncode == 3:
+    # wait4 (instead of subprocess.run) gives the peak memory of this very run
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    timer = threading.Timer(timeout, p.kill) if timeout else None
+    if timer:
+        timer.start()
+    out = p.stdout.read().decode(errors="replace").replace("\r", "\n")
+    p.stdout.close()
+    _, status, usage = os.wait4(p.pid, 0)
+    returncode = os.waitstatus_to_exitcode(status)
+    if timer:
+        timer.cancel()
+    with _peak_lock:
+        kb = usage.ru_maxrss // 1024 if sys.platform == "darwin" else usage.ru_maxrss
+        if kb > _peak["kb"]:
+            _peak.update(kb=kb, epd=epd)
+    if returncode == 3:
         return dict(status="cap", positions=max_nodes, mate=None, pv=None)
-    if p.returncode != 0:
+    if returncode != 0:
         return dict(status="fail", positions=0, mate=None, pv=None)
     found = re.search(r"Found (\d+) positions", out)
     res = re.search(r"Matetrack:\n.*bm #(-?\d+); PV: ([^;]*);", out)
