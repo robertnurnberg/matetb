@@ -2,6 +2,7 @@
 restriction sets, and a runner for the real matetb / matetb_threaded binaries."""
 import os
 import re
+import signal
 import subprocess
 import sys
 import threading
@@ -152,8 +153,8 @@ def peak_memory_report(workers):
 def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
     """Run matetb (threads == 1) or matetb_threaded with --maxNodes.
 
-    Returns dict(status, positions, mate, pv); status is 'ok' (tree complete; mate is
-    the proven mate or None), 'cap' (more than max_nodes positions), or 'fail'.
+    Returns dict(status, positions, mate, pv[, error]); status is 'ok' (tree complete;
+    mate is the proven mate or None), 'cap' (more than max_nodes positions), or 'fail'.
     """
     exe = "matetb" if threads <= 1 else "matetb_threaded"
     cmd = [os.path.join(repo, exe), "--epd", epd, *argv, "--maxNodes", str(max_nodes)]
@@ -161,7 +162,14 @@ def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
         cmd += ["--concurrency", str(threads)]
     # wait4 (instead of subprocess.run) gives the peak memory of this very run
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    timer = threading.Timer(timeout, p.kill) if timeout else None
+    timed_out = threading.Event()
+    def on_timeout():
+        timed_out.set()
+        try:
+            p.kill()
+        except ProcessLookupError:
+            pass
+    timer = threading.Timer(timeout, on_timeout) if timeout else None
     if timer:
         timer.start()
     out = p.stdout.read().decode(errors="replace").replace("\r", "\n")
@@ -177,7 +185,16 @@ def run_matetb(repo, epd, argv, max_nodes, threads=1, timeout=None):
     if returncode == 3:
         return dict(status="cap", positions=max_nodes, mate=None, pv=None)
     if returncode != 0:
-        return dict(status="fail", positions=0, mate=None, pv=None)
+        if timed_out.is_set():
+            err = "timeout"
+        elif returncode < 0:
+            try:
+                err = f"{signal.Signals(-returncode).name} (rc={returncode})"
+            except ValueError:
+                err = f"rc={returncode}"
+        else:
+            err = f"rc={returncode}"
+        return dict(status="fail", positions=0, mate=None, pv=None, error=err)
     found = re.search(r"Found (\d+) positions", out)
     res = re.search(r"Matetrack:\n.*bm #(-?\d+); PV: ([^;]*);", out)
     return dict(status="ok", positions=int(found.group(1)) if found else 0,
