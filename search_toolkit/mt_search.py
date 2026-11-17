@@ -87,9 +87,14 @@ def main():
     todo.sort(key=lambda t: t[0])  # most constrained defender first
     if args.limit:
         todo = todo[:args.limit]
-    est = args.workers * args.max_nodes * (200 if args.threads <= 1 else 400) / 1e9
-    print(f"{len(todo)} candidates, {args.workers} workers x {args.threads} threads, "
-          f"memory up to ~{est:.0f} GB", flush=True)
+    # measured per position: ~110 B while building a tree that gets capped; for a tree that
+    # completes close to the cap ~180 B (matetb) and 295-355 B (matetb_threaded, 193M and
+    # 0.65M positions), with some margin
+    full = args.workers * args.max_nodes * (200 if args.threads <= 1 else 350) / 1e9
+    capped = args.workers * args.max_nodes * 110 / 1e9
+    print(f"{len(todo)} candidates, {args.workers} workers x {args.threads} threads, memory "
+          f"up to ~{full:.1f} GB if runs complete near the cap, ~{capped:.1f} GB for runs "
+          f"that hit it", flush=True)
 
     t0, solved, shorter, failed = time.time(), 0, 0, 0
     with open(args.out, "a") as out, cf.ThreadPoolExecutor(args.workers) as pool:
