@@ -35,7 +35,7 @@ A tree that exceeds `--max-nodes` stops the ladder (weaker sets have bigger tree
 Results are JSON lines. Reruns skip solved candidates and those that already exceeded a cap at least as
 large; use a larger `--max-nodes` to go deeper. Suggested passes: 200k (all cores), 5M (cores/2 workers),
 then 100M+ with `--workers 1 --threads N` and `--max-davg 4 --min-bm 20`. Peak memory is about 200 bytes per
-position per worker (about 400 with `--threads`). `--max-davg` skips candidates whose defender has many
+position per worker (about 350 with `--threads`; 295 were measured for 193M positions). `--max-davg` skips candidates whose defender has many
 replies along the PV (solved entries have a median of about 2.4, the rest about 6).
 
 ## Patch
