@@ -3013,11 +3013,21 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "b2 f2 b4 d4 f4 d6";
     excludeToCapturable = true;
     excludeAllowingFrom = "g1 a2 g2 h2 e5 b6 f6 g6 b7 g8";
+  } else if (epd == "8/2p2p2/5p2/5p2/2B2p2/p2n4/kp1K1p2/b4r2 b - -" || // bm #-37
+             epd == "8/2p2p2/5p2/1B3p2/5p2/p2n4/kp1K1p2/b4r2 w - -") { // bm #38
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a1 f1 b2 d3";
   } else if (epd == "8/8/7P/5P2/6k1/4p3/ppp1p3/brrbK3 b - -" || // bm #-38
              epd == "8/8/8/5P1P/6k1/4p3/ppp1p3/brrbK3 w - -") { // bm #39
     excludeFrom = "e1";
     excludePromotionTo = "rbn";
     excludeToCapturable = true;
+  } else if (epd == "k1b5/1p1p3p/1p1Pp3/pP2Pp2/P4P2/p1K2P2/P4P2/8 b - -" || // bm #-40
+             epd == "k1b5/1p1p3p/1p1Pp3/pP2Pp2/P4P2/pK3P2/P4P2/8 w - -") {  // bm #41
+    excludeFrom = "f2 f3 a4 f4 b5 e5";
+    excludePromotionTo = "rbn";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "a3 a5 f5 b6 e6 b7 d7 c8";
   } else if (epd == "8/p1Q4p/8/2p5/1p6/8/ppPp2p1/qrbK2kb b - -" || // bm #-41
              epd == "8/p6p/8/Q1p5/1p6/8/ppPp2p1/qrbK2kb w - -") {  // bm #42
     excludePromotionTo = "rbn";
@@ -3109,6 +3119,13 @@ inline void Options::fill_exclude_options() {
     excludeAllowingFrom = "e2 f2 f3 g2 g3 g4 h4";
     excludeAllowingTo = "d3";
     excludeToCapturable = true;
+  } else if (epd == "7n/3p1p2/3p1Np1/3p1pP1/3p1p1B/5k1b/5Pr1/3K3B b - -" || // bm #-61
+             epd == "7n/3p1p2/3p1Np1/3p1pP1/3p1p1B/5k1b/3K1Pr1/7B w - -" || // bm #62
+             epd == "7n/3p1p2/3p1Np1/3p1pP1/3p1p1B/5k1b/5Pr1/4K2B b - -" || // bm #-63
+             epd == "7n/3p1p2/3p1Np1/3p1pP1/3p1p1B/5k1b/5Pr1/5K1B w - -") { // bm #64
+    excludeFrom = "f2 h4 g5 f6";
+    excludeAllowingCapture = true;
+    excludeAllowingFrom = "g2 f3 f4 f5 g6 f7 h8";
   } else if (epd == "8/p2K2p1/rp6/1p2p3/brpn4/Rnk5/4p1p1/2B1N1N1 b - -" || // bm #-65
              epd == "2K5/p5p1/rp6/1p2p3/brpn4/Rnk5/4p1p1/2B1N1N1 w - -") { // bm #66
     excludeFrom = "c1 e1 a3";
