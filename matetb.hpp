@@ -202,13 +202,14 @@ protected:
   }
 
   score_t spawn_allowed_children(const PackedBoard &pfen,
-                                 std::vector<PackedBoard> &children) {
+                                 std::vector<PackedBoard> &children,
+                                 bool generate_children) {
     auto board = Board::Compact::decode(pfen);
     Movelist legal_moves;
     movegen::legalmoves(legal_moves, board);
     score_t score =
         legal_moves.size() == 0 && board.inCheck() ? -VALUE_MATE : 0;
-    if (score)
+    if (score || !generate_children)
       return score;
     std::string onlyMove;
     if (!openingBook.empty()) {

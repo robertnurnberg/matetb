@@ -58,10 +58,12 @@ void MateTB::initialize_tb() {
           if (too_many)
             break;
           std::vector<PackedBoard> children;
-          score_t score = spawn_allowed_children(pfen, children);
+          const bool generate_children = (depth < max_depth);
+          score_t score =
+              spawn_allowed_children(pfen, children, generate_children);
           if (score) {
             local_mate_score.push_back({pfen, score});
-          } else if (depth < max_depth) {
+          } else if (generate_children) {
             for (const PackedBoard &child : children) {
               size_t count_check;
               bool is_new_entry = fen2index.lazy_emplace_l(
