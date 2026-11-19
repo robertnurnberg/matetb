@@ -95,29 +95,8 @@ void MateTB::connect_children() {
   std::cout << "Connect child nodes ..." << std::endl;
   size_t dim = fen2index.size(), count = 0;
   for (const auto &[pfen, idx] : fen2index) {
-    count++;
-    if (tb[idx].first) // do not add children to mate nodes
-      continue;
-    auto board = Board::Compact::decode(pfen);
-    const bool is_defender = (board.sideToMove() != mating_side);
-    Movelist legal_moves;
-    movegen::legalmoves(legal_moves, board);
-    for (const Move &move : legal_moves) {
-      board.makeMove<true>(move);
-      auto child_pfen = Board::Compact::encode(board);
-      auto it = fen2index.find(child_pfen);
-      if (it != fen2index.end()) {
-        index_t childidx = it->second;
-        tb[idx].second.push_back(childidx);
-      } else if (is_defender) {
-        // hitting max_depth may lead to partial(!) scoring of defender's moves
-        // in that case we remove all added children to avoid false mate scores
-        tb[idx].second.clear();
-        break;
-      }
-      board.unmakeMove(move);
-    }
-    if (count % 10000 == 0)
+    link_children(pfen, idx);
+    if (++count % 10000 == 0)
       std::cout << "Progress: " << count << "/" << dim << "\r" << std::flush;
   }
   auto toc = std::chrono::high_resolution_clock::now();

@@ -127,27 +127,7 @@ void MateTB::connect_children() {
   ThreadPool pool(concurrency);
   for (const auto &[pfen, idx] : fen2index) {
     pool.enqueue([this, &pfen, idx, &count, dim]() {
-      if (tb[idx].first) // do not add children to mate nodes
-        return;
-      auto board = Board::Compact::decode(pfen);
-      const bool is_defender = (board.sideToMove() != mating_side);
-      Movelist legal_moves;
-      movegen::legalmoves(legal_moves, board);
-      for (const Move &move : legal_moves) {
-        board.makeMove<true>(move);
-        auto child_pfen = Board::Compact::encode(board);
-        auto it = fen2index.find(child_pfen);
-        if (it != fen2index.end()) {
-          index_t childidx = it->second;
-          tb[idx].second.push_back(childidx);
-        } else if (is_defender) {
-          // hitting max_depth may lead to partial scoring of defender's moves
-          // in that case remove all added children to avoid false mate scores
-          tb[idx].second.clear();
-          break;
-        }
-        board.unmakeMove(move);
-      }
+      link_children(pfen, idx);
       const size_t count_check = ++count;
       if (count_check % 10000 == 0) {
         std::stringstream ss;
