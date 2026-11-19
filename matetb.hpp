@@ -137,7 +137,7 @@ protected:
   Bitboard BBrestrictTo, BBexcludeFrom, BBexcludeTo, BBexcludeAllowingFrom,
       BBexcludeAllowingTo;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
-      excludeAllowingCapture, needToGenerateResponses;
+      excludeAllowingCapture, excludeAllowingPromotion, needToGenerateResponses;
   int max_depth, verbose;
   size_t max_nodes;
 
@@ -184,6 +184,7 @@ protected:
         if ((excludeToCapturable && board.isCapture(m) &&
              m.to() == move.to()) ||
             (excludeAllowingCapture && board.isCapture(m)) ||
+            (excludeAllowingPromotion && m.typeOf() == Move::PROMOTION) ||
             (BBexcludeAllowingFrom & Bitboard::fromSquare(m.from())) ||
             (BBexcludeAllowingTo & Bitboard::fromSquare(m.to())) ||
             (std::find(excludeAllowingMoves.begin(), excludeAllowingMoves.end(),
@@ -291,6 +292,7 @@ public:
     excludeToCapturable = options.excludeToCapturable;
     excludePromotionTo = options.excludePromotionTo;
     excludeAllowingCapture = options.excludeAllowingCapture;
+    excludeAllowingPromotion = options.excludeAllowingPromotion;
     for (const std::string &sq : split(options.excludeAllowingFrom))
       BBexcludeAllowingFrom |= Bitboard::fromSquare(Square(sq));
     for (const std::string &sq : split(options.excludeAllowingTo))
@@ -298,6 +300,7 @@ public:
     excludeAllowingMoves = split(options.excludeAllowingMoves);
     excludeAllowingSANs = split(options.excludeAllowingSANs);
     needToGenerateResponses = excludeToCapturable || excludeAllowingCapture ||
+                              excludeAllowingPromotion ||
                               BBexcludeAllowingFrom || BBexcludeAllowingTo ||
                               !excludeAllowingMoves.empty() ||
                               !excludeAllowingSANs.empty();

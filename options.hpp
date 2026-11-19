@@ -18,7 +18,7 @@ public:
       excludeAllowingFrom, excludeAllowingTo, excludeAllowingMoves,
       excludeAllowingSANs, outFile;
   bool excludeCaptures, excludeToAttacked, excludeToCapturable,
-      excludeAllowingCapture;
+      excludeAllowingCapture, excludeAllowingPromotion;
   int depth, verbose, concurrency;
   size_t maxNodes;
   Options()
@@ -28,6 +28,7 @@ public:
         excludeAllowingMoves(""), excludeAllowingSANs(""), outFile(""),
         excludeCaptures(false), excludeToAttacked(false),
         excludeToCapturable(false), excludeAllowingCapture(false),
+        excludeAllowingPromotion(false),
         depth(MAX_DEPTH), verbose(0), concurrency(0), maxNodes(0) {}
   Options(int argc, char **argv, bool use_concurrency = false);
   void fill_exclude_options();
@@ -100,6 +101,10 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
       .implicit_value(true)
       .help("Avoid moves that allow a capture somewhere on the board (much "
             "slower than --excludeToAttacked).");
+  args.add_argument("--excludeAllowingPromotion")
+      .default_value(false)
+      .implicit_value(true)
+      .help("Avoid moves that allow the opponent to promote a pawn.");
   args.add_argument("--excludeAllowingFrom")
       .default_value("")
       .help("Space separated square names that opponent's pieces should not be "
@@ -152,6 +157,7 @@ inline Options::Options(int argc, char **argv, bool use_concurrency)
   excludeToCapturable = args.get<bool>("excludeToCapturable");
   excludePromotionTo = args.get("excludePromotionTo");
   excludeAllowingCapture = args.get<bool>("excludeAllowingCapture");
+  excludeAllowingPromotion = args.get<bool>("excludeAllowingPromotion");
   excludeAllowingFrom = args.get("excludeAllowingFrom");
   excludeAllowingTo = args.get("excludeAllowingTo");
   excludeAllowingMoves = args.get("excludeAllowingMoves");
@@ -169,7 +175,8 @@ inline void Options::fill_exclude_options() {
       !restrictTo.empty() || !excludeFrom.empty() || !excludeTo.empty() ||
       excludeCaptures || !excludeCapturesOf.empty() || excludeToAttacked ||
       excludeToCapturable || !excludePromotionTo.empty() ||
-      excludeAllowingCapture || !excludeAllowingFrom.empty() ||
+      excludeAllowingCapture || excludeAllowingPromotion ||
+      !excludeAllowingFrom.empty() ||
       !excludeAllowingTo.empty() || !excludeAllowingMoves.empty() ||
       !excludeAllowingSANs.empty())
     return;
@@ -3387,6 +3394,8 @@ inline void Options::print(std::ostream &os) const {
     os << "--excludePromotionTo " << enclosed_string(excludePromotionTo) << " ";
   if (excludeAllowingCapture)
     os << "--excludeAllowingCapture ";
+  if (excludeAllowingPromotion)
+    os << "--excludeAllowingPromotion ";
   if (!excludeAllowingFrom.empty())
     os << "--excludeAllowingFrom " << enclosed_string(excludeAllowingFrom)
        << " ";
