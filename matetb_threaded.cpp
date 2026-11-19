@@ -20,8 +20,6 @@ using index_map_t = phmap::parallel_flat_hash_map<
     std::allocator<std::pair<PackedBoard, index_t>>, 8, std::mutex>;
 
 class MateTB : public MateTbBase<index_map_t> {
-  score_t spawn_allowed_children(const PackedBoard &pfen,
-                                 std::vector<PackedBoard> &children);
   int concurrency;
   void initialize_tb();
   void connect_children();
@@ -31,42 +29,6 @@ public:
   MateTB(const Options &options)
       : MateTbBase<index_map_t>(options), concurrency(options.concurrency) {}
 };
-
-score_t MateTB::spawn_allowed_children(const PackedBoard &pfen,
-                                       std::vector<PackedBoard> &children) {
-  auto board = Board::Compact::decode(pfen);
-  Movelist legal_moves;
-  movegen::legalmoves(legal_moves, board);
-  score_t score = legal_moves.size() == 0 && board.inCheck() ? -VALUE_MATE : 0;
-  if (score)
-    return score;
-  std::string onlyMove;
-  if (!openingBook.empty()) {
-    std::string fen = board.getFen(false);
-    if (openingBook.count(fen))
-      onlyMove = openingBook[fen];
-    if (verbose >= 3 && !onlyMove.empty()) {
-      std::cout << "Picked move " << onlyMove << " for " << fen << "."
-                << std::endl;
-      if (verbose >= 4) {
-        std::cout << "Remaining book: ";
-        for (const auto &entry : openingBook)
-          std::cout << entry.first << ": " << entry.second << ", ";
-        std::cout << std::endl;
-      }
-    }
-  }
-  for (const Move &move : legal_moves) {
-    if (!onlyMove.empty() && move != uci::uciToMove(board, onlyMove))
-      continue;
-    if (onlyMove.empty() && !allowed_move(board, move))
-      continue;
-    board.makeMove<true>(move);
-    children.push_back(Board::Compact::encode(board));
-    board.unmakeMove(move);
-  }
-  return score;
-}
 
 void MateTB::initialize_tb() {
   auto tic = std::chrono::high_resolution_clock::now();
