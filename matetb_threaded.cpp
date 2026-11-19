@@ -168,6 +168,7 @@ void MateTB::connect_children() {
       if (tb[idx].first) // do not add children to mate nodes
         return;
       auto board = Board::Compact::decode(pfen);
+      const bool is_defender = (board.sideToMove() != mating_side);
       Movelist legal_moves;
       movegen::legalmoves(legal_moves, board);
       for (const Move &move : legal_moves) {
@@ -177,6 +178,11 @@ void MateTB::connect_children() {
         if (it != fen2index.end()) {
           index_t childidx = it->second;
           tb[idx].second.push_back(childidx);
+        } else if (is_defender) {
+          // hitting max_depth may lead to partial scoring of defender's moves
+          // in that case remove all added children to avoid false mate scores
+          tb[idx].second.clear();
+          break;
         }
         board.unmakeMove(move);
       }
