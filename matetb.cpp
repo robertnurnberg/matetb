@@ -40,9 +40,10 @@ void MateTB::initialize_tb() {
       std::cout << "Progress: " << count << " (d" << depth << ")\r"
                 << std::flush;
     std::vector<PackedBoard> children;
-    score_t score = spawn_allowed_children(pfen, children);
+    const bool generate_children = (depth < max_depth);
+    score_t score = spawn_allowed_children(pfen, children, generate_children);
     tb.emplace_back(score, std::vector<index_t>());
-    if (score || depth + 1 > max_depth)
+    if (score || !generate_children)
       continue;
     for (const PackedBoard &child : children) {
       if (fen2index.emplace(child, count).second) {
