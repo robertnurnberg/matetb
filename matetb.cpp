@@ -39,40 +39,12 @@ void MateTB::initialize_tb() {
     if (++processed % 1000 == 0)
       std::cout << "Progress: " << count << " (d" << depth << ")\r"
                 << std::flush;
-    auto board = Board::Compact::decode(pfen);
-    Movelist legal_moves;
-    movegen::legalmoves(legal_moves, board);
-    score_t score =
-        legal_moves.size() == 0 && board.inCheck() ? -VALUE_MATE : 0;
+    std::vector<PackedBoard> children;
+    score_t score = spawn_allowed_children(pfen, children);
     tb.emplace_back(score, std::vector<index_t>());
-    if (score)
+    if (score || depth + 1 > max_depth)
       continue;
-    std::string onlyMove;
-    if (!openingBook.empty()) {
-      std::string fen = board.getFen(false);
-      if (openingBook.count(fen))
-        onlyMove = openingBook[fen];
-      if (verbose >= 3 && !onlyMove.empty()) {
-        std::cout << "Picked move " << onlyMove << " for " << fen << "."
-                  << std::endl;
-        if (verbose >= 4) {
-          std::cout << "Remaining book: ";
-          for (const auto &entry : openingBook)
-            std::cout << entry.first << ": " << entry.second << ", ";
-          std::cout << std::endl;
-        }
-      }
-    }
-    for (const Move &move : legal_moves) {
-      if (!onlyMove.empty() && move != uci::uciToMove(board, onlyMove))
-        continue;
-      if (onlyMove.empty() && !allowed_move(board, move))
-        continue;
-      board.makeMove<true>(move);
-      PackedBoard child = Board::Compact::encode(board);
-      board.unmakeMove(move);
-      if (depth + 1 > max_depth)
-        continue;
+    for (const PackedBoard &child : children) {
       if (fen2index.emplace(child, count).second) {
         count++;
         if (max_nodes && count > max_nodes)
