@@ -33,34 +33,35 @@ Matetrack:
 ```
 
 ```
-Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
+Usage: matetb [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingPromotion] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
 Optional arguments:
-  -h, --help                shows help message and exits
-  -v, --version             prints version information and exits
-  --epd                     EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
-  --depth                   Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 2147483646]
-  --maxNodes                Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
-  --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
-  --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
-  --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
-  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
-  --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
-  --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
-  --excludeCaptures         Never capture.
-  --excludeCapturesOf       String containing piece types that should never be captured, e.g. "qrbn". [nargs=0..1] [default: ""]
-  --excludeToAttacked       Never move to attacked squares (including from pinned pieces, but ignoring en passant).
-  --excludeToCapturable     Never move to a square that risks capture (much slower than --excludeToAttacked).
-  --excludePromotionTo      String containing piece types that should never be promoted to, e.g. "qrb". [nargs=0..1] [default: ""]
-  --excludeAllowingCapture  Avoid moves that allow a capture somewhere on the board (much slower than --excludeToAttacked).
-  --excludeAllowingFrom     Space separated square names that opponent's pieces should not be allowed to move from in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingTo       Space separated square names that opponent's pieces should not be allowed to move to in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingMoves    Space separated UCI moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingSANs     Space separated SAN moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
-  --outFile                 Optional output file for the TB. [nargs=0..1] [default: ""]
-  --verbose                 Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn and bm info. [nargs=0..1] [default: 0]
+  -h, --help                  shows help message and exits
+  -v, --version               prints version information and exits
+  --epd                       EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
+  --depth                     Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 2147483646]
+  --maxNodes                  Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
+  --openingMoves              Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
+  --excludeMoves              Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
+  --excludeSANs               Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo                Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
+  --excludeFrom               Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
+  --excludeTo                 Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
+  --excludeCaptures           Never capture.
+  --excludeCapturesOf         String containing piece types that should never be captured, e.g. "qrbn". [nargs=0..1] [default: ""]
+  --excludeToAttacked         Never move to attacked squares (including from pinned pieces, but ignoring en passant).
+  --excludeToCapturable       Never move to a square that risks capture (much slower than --excludeToAttacked).
+  --excludePromotionTo        String containing piece types that should never be promoted to, e.g. "qrb". [nargs=0..1] [default: ""]
+  --excludeAllowingCapture    Avoid moves that allow a capture somewhere on the board (much slower than --excludeToAttacked).
+  --excludeAllowingPromotion  Avoid moves that allow the opponent to promote a pawn.
+  --excludeAllowingFrom       Space separated square names that opponent's pieces should not be allowed to move from in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingTo         Space separated square names that opponent's pieces should not be allowed to move to in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingMoves      Space separated UCI moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingSANs       Space separated SAN moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
+  --outFile                   Optional output file for the TB. [nargs=0..1] [default: ""]
+  --verbose                   Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn and bm info. [nargs=0..1] [default: 0]
 ```
 
 ## Threaded version
@@ -97,33 +98,34 @@ Matetrack:
 ```
 
 ```
-Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
+Usage: matetb_threaded [--help] [--version] [--epd VAR] [--depth VAR] [--maxNodes VAR] [--openingMoves VAR] [--excludeMoves VAR] [--excludeSANs VAR] [--restrictTo VAR] [--excludeFrom VAR] [--excludeTo VAR] [--excludeCaptures] [--excludeCapturesOf VAR] [--excludeToAttacked] [--excludeToCapturable] [--excludePromotionTo VAR] [--excludeAllowingCapture] [--excludeAllowingPromotion] [--excludeAllowingFrom VAR] [--excludeAllowingTo VAR] [--excludeAllowingMoves VAR] [--excludeAllowingSANs VAR] [--outFile VAR] [--verbose VAR] [--concurrency VAR]
 
 Prove (upper bound) for best mate for a given position by constructing a custom tablebase for a (reduced) game tree.
 
 Optional arguments:
-  -h, --help                shows help message and exits
-  -v, --version             prints version information and exits
-  --epd                     EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
-  --depth                   Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 2147483646]
-  --maxNodes                Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
-  --openingMoves            Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
-  --excludeMoves            Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
-  --excludeSANs             Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
-  --restrictTo              Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
-  --excludeFrom             Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
-  --excludeTo               Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
-  --excludeCaptures         Never capture.
-  --excludeCapturesOf       String containing piece types that should never be captured, e.g. "qrbn". [nargs=0..1] [default: ""]
-  --excludeToAttacked       Never move to attacked squares (including from pinned pieces, but ignoring en passant).
-  --excludeToCapturable     Never move to a square that risks capture (much slower than --excludeToAttacked).
-  --excludePromotionTo      String containing piece types that should never be promoted to, e.g. "qrb". [nargs=0..1] [default: ""]
-  --excludeAllowingCapture  Avoid moves that allow a capture somewhere on the board (much slower than --excludeToAttacked).
-  --excludeAllowingFrom     Space separated square names that opponent's pieces should not be allowed to move from in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingTo       Space separated square names that opponent's pieces should not be allowed to move to in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingMoves    Space separated UCI moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
-  --excludeAllowingSANs     Space separated SAN moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
-  --outFile                 Optional output file for the TB. [nargs=0..1] [default: ""]
-  --verbose                 Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn and bm info. [nargs=0..1] [default: 0]
-  --concurrency             Number of concurrent threads to use. [nargs=0..1] [default: 24]
+  -h, --help                  shows help message and exits
+  -v, --version               prints version information and exits
+  --epd                       EPD for the root position. If bm is not given, it is assumed that the side to move is mating. [nargs=0..1] [default: "8/8/8/1p6/6k1/1p2Q3/p1p1p3/rbrbK3 w - - bm #36;"]
+  --depth                     Maximal depth for the to be constructed game tree (a too low value means mate cannot be found). [nargs=0..1] [default: 24]
+  --maxNodes                  Maximal allowed size for the game tree (0 means no limit). Program aborts when limit is reached. [nargs=0..1] [default: "0"]
+  --openingMoves              Comma separated opening lines in UCI notation that specify the mating side's moves. In each line a single placeholder '*' is allowed for the defending side. [nargs=0..1] [default: ""]
+  --excludeMoves              Space separated UCI moves that are not allowed. [nargs=0..1] [default: ""]
+  --excludeSANs               Space separated SAN moves that are not allowed. [nargs=0..1] [default: ""]
+  --restrictTo                Space separated square names that pieces can move to. [nargs=0..1] [default: ""]
+  --excludeFrom               Space separated square names that pieces should never move from. [nargs=0..1] [default: ""]
+  --excludeTo                 Space separated square names that pieces should never move to. [nargs=0..1] [default: ""]
+  --excludeCaptures           Never capture.
+  --excludeCapturesOf         String containing piece types that should never be captured, e.g. "qrbn". [nargs=0..1] [default: ""]
+  --excludeToAttacked         Never move to attacked squares (including from pinned pieces, but ignoring en passant).
+  --excludeToCapturable       Never move to a square that risks capture (much slower than --excludeToAttacked).
+  --excludePromotionTo        String containing piece types that should never be promoted to, e.g. "qrb". [nargs=0..1] [default: ""]
+  --excludeAllowingCapture    Avoid moves that allow a capture somewhere on the board (much slower than --excludeToAttacked).
+  --excludeAllowingPromotion  Avoid moves that allow the opponent to promote a pawn.
+  --excludeAllowingFrom       Space separated square names that opponent's pieces should not be allowed to move from in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingTo         Space separated square names that opponent's pieces should not be allowed to move to in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingMoves      Space separated UCI moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
+  --excludeAllowingSANs       Space separated SAN moves that opponent should not be allowed to make in reply to our move. [nargs=0..1] [default: ""]
+  --outFile                   Optional output file for the TB. [nargs=0..1] [default: ""]
+  --verbose                   Specify the verbosity level. E.g. --verbose 1 shows PVs for all legal moves, and --verbose 2 also links to chessdb.cn and bm info. [nargs=0..1] [default: 24]
+  --concurrency               Number of concurrent threads to use. [nargs=0..1] [default: 24]
 ```
