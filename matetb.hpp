@@ -206,7 +206,8 @@ protected:
     auto board = Board::Compact::decode(pfen);
     Movelist legal_moves;
     movegen::legalmoves(legal_moves, board);
-    score_t score = legal_moves.size() == 0 && board.inCheck() ? -VALUE_MATE : 0;
+    score_t score =
+        legal_moves.size() == 0 && board.inCheck() ? -VALUE_MATE : 0;
     if (score)
       return score;
     std::string onlyMove;

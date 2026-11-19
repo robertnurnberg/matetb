@@ -28,8 +28,8 @@ public:
         excludeAllowingMoves(""), excludeAllowingSANs(""), outFile(""),
         excludeCaptures(false), excludeToAttacked(false),
         excludeToCapturable(false), excludeAllowingCapture(false),
-        excludeAllowingPromotion(false),
-        depth(MAX_DEPTH), verbose(0), concurrency(0), maxNodes(0) {}
+        excludeAllowingPromotion(false), depth(MAX_DEPTH), verbose(0),
+        concurrency(0), maxNodes(0) {}
   Options(int argc, char **argv, bool use_concurrency = false);
   void fill_exclude_options();
   void print(std::ostream &os) const;
@@ -176,9 +176,8 @@ inline void Options::fill_exclude_options() {
       excludeCaptures || !excludeCapturesOf.empty() || excludeToAttacked ||
       excludeToCapturable || !excludePromotionTo.empty() ||
       excludeAllowingCapture || excludeAllowingPromotion ||
-      !excludeAllowingFrom.empty() ||
-      !excludeAllowingTo.empty() || !excludeAllowingMoves.empty() ||
-      !excludeAllowingSANs.empty())
+      !excludeAllowingFrom.empty() || !excludeAllowingTo.empty() ||
+      !excludeAllowingMoves.empty() || !excludeAllowingSANs.empty())
     return;
 
   auto parts = split(epdStr);
