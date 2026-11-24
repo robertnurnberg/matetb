@@ -3019,11 +3019,11 @@ inline void Options::fill_exclude_options() {
     excludeFrom = "b2 f2 b4 d4 f4 d6";
     excludeToCapturable = true;
     excludeAllowingFrom = "g1 a2 g2 h2 e5 b6 f6 g6 b7 g8";
-  } else if (epd == "8/8/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||     // bm #3
-             epd == "8/5p2/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||   // bm #9
-             epd == "8/p7/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||    // bm #14
-             epd == "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ||         // bm #-35
-             epd == "8/pp3p2/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -") { // bm #36
+  } else if (epd == "8/8/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||      // bm #3
+             epd == "8/5p2/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||    // bm #9
+             epd == "8/p7/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -" ||     // bm #14
+             epd == "8/pp3p2/8/5N2/2p1p3/2p1B3/1pp1k1NK/brrb4 b - -" || // bm #-35
+             epd == "8/pp3p2/8/8/2p1p2N/2p1B3/1pp1k1NK/brrb4 w - -") {  // bm #36
     excludeTo = "a1 b1 c1 b2 c2 c3 c4";
     excludeAllowingCapture = true;
     excludeAllowingTo = "f4 g4 g3 g1 h1 d4";
