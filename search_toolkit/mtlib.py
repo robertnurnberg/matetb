@@ -1,5 +1,6 @@
 """Helpers shared by the search scripts: matetrack parsing, PV analysis, the ladder of
 restriction sets, and a runner for the real matetb / matetb_threaded binaries."""
+import heapq
 import os
 import re
 import signal
@@ -37,9 +38,11 @@ def analyze(entry):
     ms = b.turn if entry["bm"] > 0 else (not b.turn)
     root = b.copy()
     moved_from, promoted, captured = set(), set(), set()
-    allow_capture = tocapturable = False
+    allow_capture = tocapturable = allow_promotion = False
     d_moves = []
-    immobile = {s for s, p in root.piece_map().items() if p.color != ms}
+    # what the defender can do right after one of our moves (this is where the
+    # --excludeAllowing* flags look), and where the defender promotes in the PV
+    reply_from, reply_to, promo_squares = set(), set(), set()
     for u in entry["pv"]:
         m = chess.Move.from_uci(u)
         if m not in b.legal_moves:
@@ -54,12 +57,15 @@ def analyze(entry):
             b.push(m)
             replies = list(b.legal_moves)
             allow_capture |= any(b.is_capture(r) for r in replies)
+            allow_promotion |= any(r.promotion for r in replies)
             tocapturable |= any(b.is_capture(r) and r.to_square == m.to_square
                                 for r in replies)
+            reply_from |= {r.from_square for r in replies}
+            reply_to |= {r.to_square for r in replies}
         else:
-            replies = list(b.legal_moves)
-            d_moves.append(len(replies))
-            immobile -= {r.from_square for r in replies}
+            d_moves.append(b.legal_moves.count())
+            if m.promotion:
+                promo_squares.add(m.to_square)
             b.push(m)
     pieces = root.piece_map()
     mine = {s for s, p in pieces.items() if p.color == ms}
@@ -67,13 +73,22 @@ def analyze(entry):
     pawns = {s for s in mine if pieces[s].piece_type == chess.PAWN}
     their_types = {LETTER[p.piece_type] for p in pieces.values()
                    if p.color != ms and p.piece_type in LETTER}
-    runners = 0  # defender pawns with a free path to the promotion rank
+    runners = def_pawns = 0  # defender pawns (with a free path to the promotion rank)
     for s, p in pieces.items():
         if p.piece_type == chess.PAWN and p.color != ms:
+            def_pawns += 1
             step, t = (8 if p.color else -8), s + (8 if p.color else -8)
             while 0 <= t < 64 and t not in pieces:
                 t += step
             runners += not (0 <= t < 64)
+    # defender pieces (and promoted pieces) that never have a move after one of our
+    # moves along the PV: a pawn that promotes on e.g. c1 and then never moves again
+    # must not be allowed to leave c1 in the tree either
+    immobile = ({s for s, p in pieces.items() if p.color != ms} | promo_squares) - reply_from
+    # promotion squares the PV never needs: a defender pawn is only allowed to
+    # promote where the PV lets it (only used if allowing *any* promotion is not an option)
+    promo_rank = chess.BB_RANK_1 if (not ms) == chess.BLACK else chess.BB_RANK_8
+    unused_promo_to = chess.SquareSet(promo_rank) - chess.SquareSet(reply_to)
     names = lambda squares: [chess.square_name(s) for s in sorted(squares)]
     return dict(
         frozen=names(frozen),
@@ -84,6 +99,9 @@ def analyze(entry):
         no_allowed_capture=not allow_capture,
         no_tocapturable=not tocapturable,
         immobile=names(immobile),
+        no_allowed_promotion=not allow_promotion,
+        promo_unused_to=names(unused_promo_to),
+        def_pawns=def_pawns,
         d_avg=sum(d_moves) / len(d_moves) if d_moves else 0.0,
         runners=runners)
 
@@ -109,9 +127,16 @@ def ladder(f):
         A["tocap"] = ["--excludeToCapturable"]
     if f["immobile"]:
         A["allowfrom"] = ["--excludeAllowingFrom", " ".join(f["immobile"])]
+    if f["def_pawns"]:
+        # A defender pawn that promotes and whose new piece then wanders around is the
+        # classic tree explosion: the defender's moves are never restricted, only ours.
+        if f["no_allowed_promotion"]:
+            A["allowpromo"] = ["--excludeAllowingPromotion"]
+        elif f["promo_unused_to"]:
+            A["allowto"] = ["--excludeAllowingTo", " ".join(f["promo_unused_to"])]
     keep = list(A)
     sets = [list(keep)]
-    for drop in ("allowfrom", "allowcap", "tocap", "capof", "nocap"):
+    for drop in ("allowfrom", "allowto", "allowpromo", "allowcap", "tocap", "capof", "nocap"):
         if drop in keep:
             keep.remove(drop)
             sets.append(list(keep))
@@ -123,6 +148,136 @@ def ladder(f):
             seen.add(tuple(keys))
             out.append([x for k in keys for x in A[k]])
     return out
+
+
+# --- relaxing a constraint set ----------------------------------------------------
+#
+# A constraint set is a frozenset of atoms: ("from", sq), ("allowfrom", sq),
+# ("allowto", sq), ("promo", letter), ("capof", letter), ("nocap",), ("tocap",),
+# ("allowcap",), ("allowpromo",).  A set with fewer atoms allows more moves for the
+# mating side, so its tree is a superset.
+
+SQUARE_FLAGS = {"--excludeFrom": "from", "--excludeAllowingFrom": "allowfrom",
+                "--excludeAllowingTo": "allowto"}
+LETTER_FLAGS = {"--excludePromotionTo": "promo", "--excludeCapturesOf": "capof"}
+BOOL_FLAGS = {"--excludeCaptures": "nocap", "--excludeToCapturable": "tocap",
+              "--excludeAllowingCapture": "allowcap",
+              "--excludeAllowingPromotion": "allowpromo"}
+FLAG_OF = {**{v: k for k, v in SQUARE_FLAGS.items()}, **{v: k for k, v in LETTER_FLAGS.items()},
+           **{v: k for k, v in BOOL_FLAGS.items()}}
+LETTER_KINDS = set(LETTER_FLAGS.values())
+# the order in which the atoms are given up (most speculative first), as in ladder()
+RELAX_ORDER = ["allowfrom", "allowto", "allowpromo", "allowcap", "tocap", "capof", "nocap",
+               "promo", "from"]
+
+
+def to_state(argv):
+    state, i = set(), 0
+    while i < len(argv):
+        flag = argv[i]
+        if flag in BOOL_FLAGS:
+            state.add((BOOL_FLAGS[flag],))
+            i += 1
+            continue
+        kind = SQUARE_FLAGS.get(flag) or LETTER_FLAGS[flag]
+        state |= {(kind, x) for x in (argv[i + 1].split() if flag in SQUARE_FLAGS
+                                      else argv[i + 1])}
+        i += 2
+    return frozenset(state)
+
+
+def to_argv(state):
+    out = []
+    for kind in ("from", "promo", "nocap", "capof", "tocap", "allowcap", "allowpromo",
+                 "allowfrom", "allowto"):
+        vals = [a[1] for a in state if a[0] == kind and len(a) > 1]
+        if kind in LETTER_KINDS:
+            vals.sort(key="qrbnp".index)
+        else:
+            vals.sort(key=chess.parse_square)
+        if vals:
+            out += [FLAG_OF[kind], ("" if kind in LETTER_KINDS else " ").join(vals)]
+        elif (kind,) in state:
+            out.append(FLAG_OF[kind])
+    return out
+
+
+def _implied(atom, state):
+    return (atom in state
+            or (atom[0] == "capof" and ("nocap",) in state)
+            or (atom == ("tocap",) and ("allowcap",) in state))
+
+
+def stricter(a, b):
+    """True if constraint set a allows no move that b forbids (tree(a) <= tree(b))."""
+    return all(_implied(x, a) for x in b)
+
+
+def _neighbors(state, king):
+    """One-step relaxations of a state, the most speculative atoms first."""
+    def dist(atom):
+        if len(atom) == 2 and atom[0] in ("from", "allowfrom", "allowto"):
+            sq = chess.parse_square(atom[1])
+            return chess.square_distance(sq, king)
+        return 0
+    out = []
+    for atom in sorted(state, key=lambda a: (RELAX_ORDER.index(a[0]), dist(a), a)):
+        rest = state - {atom}
+        if atom == ("allowcap",):
+            out.append(rest | {("tocap",)})  # the smaller step first
+        out.append(rest)
+    return out
+
+
+def relax_search(run, ok_states, capped_states, king, budget):
+    """Budget-aware relaxation, used once the ladder has reached a state whose tree
+    completes without proving the mate (an "ok" state) and the next ladder step blows
+    the node cap.  Between the two there are many constraint sets that would still fit:
+    drop single atoms (one frozen piece, one promotion piece, one defender square, ...)
+    from the most relaxed ok state, keep going while trees complete, and back off when
+    a tree exceeds the cap.  Nothing is run that a known result already decides:
+    a state at least as weak as a capped one is too big, a state at least as strict as a
+    completed one cannot prove more.
+
+    run(argv) -> run_matetb result plus the key "good": True if the tree proved the
+    wanted mate (or a shorter one).
+    ok_states: [(state, positions)] of the completed trees that did not.
+    king: square of the defending king (pieces close to it are given up first).
+    Returns (None or (argv, result) of the solving run, tried, runs used, exhausted)
+    where "exhausted" means the run budget ran out with relaxations left to try.
+    """
+    failed = [s for s, _ in ok_states]
+    capped = list(capped_states)
+    seen = set(failed) | set(capped)
+    heap = [(len(s), n, i, s) for i, (s, n) in enumerate(ok_states)]
+    heapq.heapify(heap)
+    tried, runs, tie = [], 0, len(heap)
+    while heap:
+        _, _, _, state = heapq.heappop(heap)
+        for nb in _neighbors(state, king):
+            if nb in seen or any(stricter(c, nb) for c in capped) \
+                    or any(stricter(nb, f) for f in failed):
+                continue
+            if runs >= budget:
+                return None, tried, runs, True
+            seen.add(nb)
+            argv = to_argv(nb)
+            r = run(argv)
+            runs += 1
+            tried.append(dict(argv=argv, status=r["status"], positions=r["positions"],
+                              mate=r["mate"], relax=True,
+                              **({"error": r["error"]} if "error" in r else {})))
+            if r["status"] == "ok":
+                if r["good"]:
+                    return (argv, r), tried, runs, False
+                failed.append(nb)
+                tie += 1
+                heapq.heappush(heap, (len(nb), r["positions"], tie, nb))
+            elif r["status"] == "cap":
+                capped.append(nb)
+            else:
+                return None, tried, runs, False  # fail: give up on this candidate
+    return None, tried, runs, False
 
 
 def prepare(repo):

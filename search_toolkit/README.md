@@ -23,12 +23,22 @@ For each candidate, restriction sets are derived from its PV and tried strictest
 | `--excludeCaptures` / `--excludeCapturesOf` | the mating side never captures / never captures those piece types |
 | `--excludeAllowingCapture` | the defender never has a capture after a mating move |
 | `--excludeToCapturable` | no mating move lets the moved piece be captured (only if the previous one does not apply) |
-| `--excludeAllowingFrom` | defender pieces that never have a legal move along the PV |
+| `--excludeAllowingFrom` | defender pieces that never have a legal move along the PV; a square where the defender promotes in the PV counts as well (a promoted piece that never moves must not be allowed to wander off in the tree) |
+| `--excludeAllowingPromotion` | the defender has a pawn and never has a promotion available after one of our moves in the PV |
+| `--excludeAllowingTo` | the PV does allow promotions: only the promotion-rank squares that no defender reply along the PV ever goes to (so pawns can only promote where the PV lets them) |
 
-Flags are then dropped (`allowfrom`, `allowcap`/`tocap`, `capof`/`nocap`), followed by sets with only
+Flags are then dropped (`allowfrom`, `allowto`, `allowpromo`, `allowcap`/`tocap`, `capof`/`nocap`), followed by sets with only
 frozen pieces plus promotions, only frozen pieces, and no flags. A PV shows one defence only, so other
 lines may need other promotion pieces; the last levels free the promotions for that reason.
-A tree that exceeds `--max-nodes` stops the ladder (weaker sets have bigger trees). A candidate is
+A tree that exceeds `--max-nodes` stops the ladder (weaker sets have bigger trees).
+If an earlier set had given a tree that fits but does not prove the mate, up to `--relax-runs`
+(default 12, 0 disables) sets *between* the last completed and the first too big one are tried
+(`mtlib.relax_search`): single constraints (one frozen piece, one excluded promotion piece, one
+defender square, `allowcap` -> `tocap`, ...) are dropped from the most relaxed completed set, and
+trees that fit are relaxed further. No run is made that a known result already decides
+(a state at least as weak as a too-big one is too big, one at least as strict as a completed one cannot
+prove more). Results with `relax_open` were stopped by the budget; rerunning with a larger
+`--relax-runs` continues them. Unit tests (no binary needed): `python3 -m unittest search_toolkit/test_mtlib.py`. A candidate is
 *solved* when a tree completes and proves matetrack's `bm`, or a **shorter** mate: that is printed as
 `SHORTER MATE` and the proven mate becomes the position's bm everywhere (epd line, `options.hpp`, child).
 

@@ -13,7 +13,10 @@ def flags(argv):
 recs = {}
 for path in sys.argv[1:]:
     for line in open(path):
-        d = json.loads(line)
+        try:
+            d = json.loads(line)
+        except json.JSONDecodeError:  # a line cut off by an interrupted run
+            continue
         old = recs.get(d["fen4"])
         if old is None or "mate" in d or ("mate" not in old and d["cap"] >= old["cap"]):
             recs[d["fen4"]] = d

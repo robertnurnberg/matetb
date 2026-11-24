@@ -4,6 +4,8 @@
 For every candidate the restriction sets of mtlib.ladder() are tried, strictest first.
 A candidate is solved if a tree completes within --max-nodes and proves matetrack's bm,
 or a shorter mate (printed as SHORTER MATE; the proven mate then counts as the bm).
+If the ladder ends with a tree that fits but proves nothing and a next step that does not
+fit, up to --relax-runs sets in between are tried (mtlib.relax_search).
 
 The output is JSON lines, one record per finished candidate, and the run is resumable:
 solved candidates and candidates that already exceeded a cap >= --max-nodes are skipped.
@@ -20,25 +22,65 @@ import os
 import sys
 import time
 
+import chess
+
 import mtlib
 
 
-def solve(repo, entry, features, cap, threads, timeout):
+def solve(repo, entry, features, cap, threads, timeout, relax_runs):
     epd = f"{entry['fen4']} bm #{entry['bm']};"
     rec = dict(fen4=entry["fen4"], bm=entry["bm"], cap=cap, tried=[])
-    for argv in mtlib.ladder(features):
+
+    def run(argv):
         r = mtlib.run_matetb(repo, epd, argv, cap, threads, timeout)
+        r["good"] = (r["status"] == "ok" and (r["mate"] == entry["bm"]
+                                              or mtlib.shorter(r["mate"], entry["bm"])))
+        return r
+
+    def solved(argv, r):
+        rec.update(mate=r["mate"], argv=argv, positions=r["positions"], pv=r["pv"])
+
+    ok_states, capped_states = [], []
+    for argv in mtlib.ladder(features):
+        r = run(argv)
         tried = dict(argv=argv, status=r["status"], positions=r["positions"],
                      mate=r["mate"])
         if "error" in r:
             tried["error"] = r["error"]
         rec["tried"].append(tried)
-        if r["status"] != "ok":
+        if r["status"] == "cap":
+            capped_states.append(mtlib.to_state(argv))
             break  # weaker sets have bigger trees
-        if r["mate"] == entry["bm"] or mtlib.shorter(r["mate"], entry["bm"]):
-            rec.update(mate=r["mate"], argv=argv, positions=r["positions"], pv=r["pv"])
-            break
+        if r["status"] != "ok":
+            return rec
+        if r["good"]:
+            solved(argv, r)
+            return rec
+        ok_states.append((mtlib.to_state(argv), r["positions"]))
+    if ok_states and capped_states:
+        # The ladder ended between a tree that fits but does not prove the mate and a
+        # tree that does not fit: try the constraint sets in between.
+        rec["relax_open"] = True
+        if relax_runs > 0:
+            board = chess.Board(entry["fen4"] + " 0 1")
+            mating = board.turn if entry["bm"] > 0 else (not board.turn)
+            hit, tried, used, exhausted = mtlib.relax_search(
+                run, ok_states, capped_states, board.king(not mating), relax_runs)
+            rec["tried"] += tried
+            rec["relax"] = relax_runs
+            rec["relax_open"] = exhausted
+            if hit:
+                solved(*hit)
     return rec
+
+
+def finished(d, args):
+    """Can a previous result for this candidate be reused with the current options?"""
+    if "mate" in d:
+        return True
+    if d["cap"] < args.max_nodes:
+        return False
+    return not (d.get("relax_open") and d.get("relax", 0) < args.relax_runs)
 
 
 def main():
@@ -57,6 +99,10 @@ def main():
     ap.add_argument("--max-bm", type=int, default=10**6)
     ap.add_argument("--max-davg", type=float, default=1e9,
                     help="skip candidates with more defender replies per move along the PV")
+    ap.add_argument("--relax-runs", type=int, default=12,
+                    help="extra matetb runs per candidate to relax single constraints when "
+                    "a tree fits but does not prove the mate and the next ladder step does "
+                    "not fit (0 disables)")
     ap.add_argument("--limit", type=int, default=0, help="stop after this many candidates")
     args = ap.parse_args()
 
@@ -79,7 +125,7 @@ def main():
     for e in mtlib.parse_epd(args.matetrack):
         d = done.get(e["fen4"])
         if (not args.min_bm <= abs(e["bm"]) <= args.max_bm or e["fen4"] in in_repo
-                or (d and ("mate" in d or d["cap"] >= args.max_nodes))):
+                or (d and finished(d, args))):
             continue
         f = mtlib.analyze(e)
         if f and f["d_avg"] <= args.max_davg:
@@ -99,7 +145,7 @@ def main():
     t0, solved, shorter, failed = time.time(), 0, 0, 0
     with open(args.out, "a") as out, cf.ThreadPoolExecutor(args.workers) as pool:
         futures = [pool.submit(solve, args.repo, e, f, args.max_nodes, args.threads,
-                               args.timeout) for _, e, f in todo]
+                               args.timeout, args.relax_runs) for _, e, f in todo]
         for n, fut in enumerate(cf.as_completed(futures), 1):
             rec = fut.result()
             out.write(json.dumps(rec) + "\n")

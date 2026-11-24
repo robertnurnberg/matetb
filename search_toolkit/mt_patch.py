@@ -24,9 +24,10 @@ import chess
 import mtlib
 
 VALUE_FLAGS = ("--excludeFrom", "--excludePromotionTo", "--excludeAllowingFrom",
-               "--excludeCapturesOf")
+               "--excludeAllowingTo", "--excludeCapturesOf")
 FLAGS = ["--excludeFrom", "--excludePromotionTo", "--excludeCaptures", "--excludeCapturesOf",
-         "--excludeToCapturable", "--excludeAllowingCapture", "--excludeAllowingFrom"]
+         "--excludeToCapturable", "--excludeAllowingCapture", "--excludeAllowingPromotion",
+         "--excludeAllowingFrom", "--excludeAllowingTo"]
 
 
 def split_flags(argv):
