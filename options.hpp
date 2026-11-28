@@ -3004,6 +3004,23 @@ inline void Options::fill_exclude_options() {
     excludeToCapturable = true;
     excludeAllowingPromotion = true;
     excludeAllowingFrom = "a8";
+  } else if (epd == "8/5p2/5Pp1/6B1/6p1/2p3pp/2P1K2p/5Rkb b - -" || // bm #-11
+             epd == "8/5p2/5Pp1/6B1/5Rp1/2p3pp/2P1K2p/6kb w - -") { // bm #12
+    excludeFrom = "c2 e2 f6";
+    excludeAllowingPromotion = true;
+    excludeAllowingFrom = "h1 h2 c3 h3 g4 f7";
+  } else if (epd == "8/8/K7/8/1p6/1p5B/1B5p/7k b - -" ||  // bm #-11
+             epd == "8/8/8/8/Kp6/1p5B/1B5p/7k b - -" ||   // bm #-11
+             epd == "8/8/K7/8/1p6/1p6/1B5p/5B1k w - -" || // bm #12
+             epd == "8/8/8/8/Kp6/1p6/1B5p/5B1k w - -") {  // bm #12
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
+    excludeAllowingFrom = "h2";
+  } else if (epd == "k7/p7/B7/8/8/2Bp4/8/7K b - -" || // bm #-11
+             epd == "k7/p7/B7/8/8/3p4/8/B6K w - -") { // bm #12
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
+    excludeAllowingFrom = "a7";
   } else if (epd == "8/8/1p6/1p6/1p6/1p3N2/pppbK3/rbk5 b - -" || // bm #-12
              epd == "8/8/1p6/1p6/1p6/1p6/pppbK3/rbk3N1 w - -") { // bm #13
     excludeFrom = "e2";
@@ -3172,6 +3189,21 @@ inline void Options::fill_exclude_options() {
     excludeAllowingCapture = true;
     excludeAllowingPromotion = true;
     excludeAllowingFrom = "a4 a5 c5 a6 g6 a7 b7 c7 a8";
+  } else if (epd == "6k1/3p4/3P2K1/5p1p/1P6/8/8/8 b - -" || // bm #-12
+             epd == "6k1/3p4/3P2K1/5p1p/8/8/1P6/8 w - -") { // bm #13
+    excludeFrom = "d6 g6";
+    excludePromotionTo = "rbn";
+    excludeAllowingCapture = true;
+    excludeAllowingTo = "a1 b1 c1 d1 e1 g1";
+  } else if (epd == "8/8/4p3/2p5/p7/K7/2r5/1k5Q b - -" ||  // bm #-12
+             epd == "8/8/4p3/2p5/p3Q3/K7/2r5/1k6 w - -") { // bm #13
+    excludeFrom = "a3";
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
+  } else if (epd == "8/8/8/8/8/3K4/B2p4/kN1N4 b - -" ||   // bm #-12
+             epd == "8/8/4B3/8/8/3K4/p2p4/kN1N4 w - -") { // bm #13
+    excludeAllowingPromotion = true;
+    excludeAllowingFrom = "d2";
   } else if (epd == "3n4/B1p3p1/4prB1/n1P5/p1pP1rp1/4b3/1pPNNp1K/1k5Q b - -" ||   // bm #-13
              epd == "3n4/B1p3p1/4prB1/n1P5/p1pP1rp1/4b3/1pP1Np1K/1k3N1Q w - -") { // bm #14
     excludeFrom = "h1 c2 d4 c5 g6";
@@ -3280,6 +3312,16 @@ inline void Options::fill_exclude_options() {
     excludeToCapturable = true;
     excludeAllowingPromotion = true;
     excludeAllowingFrom = "a1 a2";
+  } else if (epd == "8/3p4/8/5p2/3Q3p/7K/5r2/6k1 b - -" || // bm #-13
+             epd == "8/3p4/8/2Q2p2/7p/7K/5r2/6k1 w - -") { // bm #14
+    excludeFrom = "h3";
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
+  } else if (epd == "r7/2b2Bp1/3p4/1b3kP1/5N2/5NK1/5P2/8 b - -" ||  // bm #-13
+             epd == "r7/2b3p1/3p4/1b1B1kP1/5N2/5NK1/5P2/8 w - -") { // bm #14
+    excludeFrom = "f2 f3 f4 g5";
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
   } else if (epd == "8/8/8/6r1/8/8/p1p5/k1KbB3 b - -" ||              // bm #-6
              epd == "8/8/8/6r1/8/6B1/p1p5/k1Kb4 w - -" ||             // bm #7
              epd == "k7/2Q5/2p5/2p5/2p5/6p1/2p1ppp1/2Kbrqrn b - -" || // bm #-14
@@ -3363,6 +3405,16 @@ inline void Options::fill_exclude_options() {
     excludeCaptures = true;
     excludeAllowingPromotion = true;
     excludeAllowingFrom = "a1 b1 c1 a2 b2 c2 d2 b3 c3";
+  } else if (epd == "2k5/1p1r4/1Kp4p/5Q2/8/8/8/8 b - -" || // bm #-14
+             epd == "2k5/1p1r4/1Kp1Q2p/8/8/8/8/8 w - -") { // bm #15
+    excludeFrom = "b6";
+    excludeAllowingCapture = true;
+    excludeAllowingPromotion = true;
+  } else if (epd == "8/2p5/8/p2N3p/P4b2/8/2K1ppp1/4krrb b - -" || // bm #-14
+             epd == "8/2p5/5N2/p6p/P4b2/8/2K1ppp1/4krrb w - -") { // bm #15
+    excludePromotionTo = "qrb";
+    excludeAllowingPromotion = true;
+    excludeAllowingFrom = "e1 g1 h1";
   } else if (epd == "8/8/8/2p5/1pp5/brpp4/qpprp2P/1nkbK3 b - -" || // bm #-15
              epd == "8/8/8/2p5/1pp5/brpp4/qpprp2P/1nkbnK2 w - -") { // bm #16
     if (epd.find(" w ") != std::string::npos)
